@@ -27,7 +27,7 @@ const animation = useRef<LottieView>(null);
           backgroundColor: 'none',
         }}
         // Find more Lottie files at https://lottiefiles.com/featured
-        source={require('../assets/animations/Animation - 1729146201385.json')}
+        source={require('../../assets/animations/Animation - 1729146201385.json')}
         onAnimationFinish={onAnimationFinish}
       />
       

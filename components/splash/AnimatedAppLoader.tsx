@@ -9,7 +9,7 @@ export default function AnimatedAppLoader({children}:{children: React.ReactNode}
 
     const onAnimationFinished = useCallback(async () => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 10000));
+          //await new Promise(resolve => setTimeout(resolve, 10000));
           await SplashScreen.hideAsync();
           // Load stuff
           await Promise.all([]);
