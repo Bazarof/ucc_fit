@@ -7,19 +7,20 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/splash.png"
     },
+
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bazarof1.ucc_fit"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +32,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "181bc5c5-b771-4b20-aabd-a87f0ad74d04"
+      }
     }
   }
 }
