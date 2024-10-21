@@ -1,12 +1,12 @@
 import { Text, View, StyleSheet } from 'react-native';
-/* @tutinfo Import <CODE>Link</CODE> component from <CODE>expo-router</CODE>. */ import { Link } from 'expo-router'; 
+import { Link } from 'expo-router'; 
 import React from 'react';
 
 export default function Index() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Home screen</Text>
-      <Link href="/about" style={styles.button}>
+      <Link href="/rutina" style={styles.button}>
         Go to About screen
       </Link>
     </View>

@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { Button, StyleSheet, View, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 
-export default function AnimatedSplashScreen(){
+export default function Rutina(){
 const animation = useRef<LottieView>(null);
 
   return (
@@ -25,7 +25,7 @@ const animation = useRef<LottieView>(null);
           backgroundColor: '#eee',
         }}
         // Find more Lottie files at https://lottiefiles.com/featured
-        source={require('../assets/animations/Animation - 1729146201385.json')}
+        source={require('../../../assets/animations/Animation - 1729146201385.json')}
       />
       
       {
