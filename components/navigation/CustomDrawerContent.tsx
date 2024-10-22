@@ -1,5 +1,6 @@
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { usePathname, router } from "expo-router";
+import { useEffect } from "react";
 import { View, Text, Image, Pressable } from "react-native";
 
 export default function CustomDrawerContent(props: any) {
@@ -41,11 +42,11 @@ export default function CustomDrawerContent(props: any) {
             label={"Inicio"}
             labelStyle={{ fontSize: 20, color: '#000' }}
             onPress={() => {
-              router.push("/(tabs)")
+              router.push("/(tabs)/home")
             }}
             style={{
               marginTop: 15,
-              backgroundColor: pathName === '/' ? '#E3E3E3' : '#fff',
+              backgroundColor: pathName === '/home' ? '#E3E3E3' : '#fff',
             }}
             />
           <DrawerItem
@@ -57,10 +58,10 @@ export default function CustomDrawerContent(props: any) {
                 }}
                 source={require('../../assets/images/icons/dumbell.png')} />
             )}
-            label={"Rutina"}
+            label={"Rutinas"}
             labelStyle={{ fontSize: 20, color: '#000' }}
             onPress={() => {
-              router.push('/(tabs)/rutina')
+              router.push('/(tabs)/rutinas')
             }}
             style={{
               backgroundColor: pathName === '/rutina' ? '#E3E3E3' : '#fff',

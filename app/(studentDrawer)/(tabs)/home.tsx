@@ -1,14 +1,12 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { Link } from 'expo-router'; 
 import React from 'react';
 
-export default function Index() {
+// Dark mode color #25292e
+
+export default function home() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home screen</Text>
-      <Link href="/rutina" style={styles.button}>
-        Go to About screen
-      </Link>
+      <Text style={styles.text}>Dashboard</Text>
     </View>
   );
 }
@@ -16,12 +14,12 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
   },
   button: {
     fontSize: 20,
@@ -29,4 +27,3 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
-

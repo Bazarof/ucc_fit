@@ -1,6 +1,6 @@
 import * as Font from 'expo-font';
 import AnimatedAppLoader from "../components/splash/AnimatedAppLoader";
-import LoginPage from '@/components/session/LoginPage';
+import LoginPage from '@/app';
 import { Stack } from 'expo-router';
 import { enableScreens } from 'react-native-screens';
 enableScreens(true);
@@ -11,11 +11,10 @@ export default function RootLayout() {
 
   return (
     <AnimatedAppLoader>
-      <LoginPage>
-          <Stack>
-            <Stack.Screen name='(drawer)' options={{headerShown: false,}}/>
-          </Stack>
-      </LoginPage>
+      <Stack screenOptions={{}}>
+        <Stack.Screen name='index' options={{headerShown: false, }} />
+        <Stack.Screen name='(studentDrawer)' options={{ headerShown: false, }} />
+      </Stack>
     </AnimatedAppLoader>
   );
 }
