@@ -3,6 +3,8 @@ import { router } from 'expo-router';
 import { View, Text,Image, StyleSheet} from "react-native";
 import AnimatedLoginButton from "../components/animations/AnimatedLoginButton";
 
+// Oauth ID cliente android: 1027066022054-komh5ro0a3n0cnnjq3k8c68udlgdv38j.apps.googleusercontent.com
+
 export default function login(){
     
     const [isLogged, setIsLogged] = useState(false);
