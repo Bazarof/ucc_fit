@@ -33,7 +33,7 @@ export default function AnimatedLoginButton({children, handleLogIn}:{children: R
 
 const styles = StyleSheet.create({
     button_login1: {
-        marginTop: 200,
+        marginTop: 100,
         backgroundColor: '#fff',
         borderRadius: 25,
         elevation: 3,

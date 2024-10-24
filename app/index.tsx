@@ -23,7 +23,8 @@ export default function login(){
 const LoginContent = ({handleLogIn}:{handleLogIn: ()=> void}) => {
     return(<>
         <View style={styles.container}>
-            <Image source={require('../assets/images/logo-ucc.png')}/>
+            <Image style={{height: 120, width: 270}} source={require('../assets/images/logo-ucc.png')}/>
+            <Text style={styles.title}>UCC Fit</Text>
             <LoginButton handleLogIn={handleLogIn}/>
         </View>
     </>);
@@ -52,5 +53,10 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    title: {
+        fontWeight: 'bold',
+        color: '#525252',
+        fontSize: 80,
     }
 });
