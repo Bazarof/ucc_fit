@@ -1,23 +1,31 @@
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session/providers/google';
+import * as Google from 'expo-auth-session';
 import { useEffect, useState } from "react";
 import { router } from 'expo-router';
 import { View, Text,Image, StyleSheet} from "react-native";
 import AnimatedLoginButton from "../components/animations/AnimatedLoginButton";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // Oauth ID cliente android: 1027066022054-komh5ro0a3n0cnnjq3k8c68udlgdv38j.apps.googleusercontent.com
+const configGoogleSignIn = () => {
+    GoogleSignin.configure({
+        webClientId: 'autoDetect',
+    });
+};
 
 export default function login(){
-    
+
     const [isLogged, setIsLogged] = useState(false);
 
     function handleLogIn(){
         setIsLogged(true);
     }
 
+
     useEffect(()=>{
-
-        if(isLogged) router.replace('/(studentDrawer)/home');
-
-    },[isLogged]);
+        if(isLogged) router.replace('/studentDrawer');
+    }, [isLogged]);
 
     return <LoginContent handleLogIn={handleLogIn}/>;
 }

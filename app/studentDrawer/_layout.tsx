@@ -16,7 +16,7 @@ export default function Layout() {
           headerTitleStyle: {fontSize: 30},
         }}>
         <Drawer.Screen
-          name="(tabs)/home"
+          name="(tabs)/index"
           options={{
             title: 'Inicio',
           }}/>

@@ -13,7 +13,7 @@ export default function RootLayout() {
     <AnimatedAppLoader>
       <Stack>
         <Stack.Screen name='index' options={{headerShown: false, }} />
-        <Stack.Screen name='(studentDrawer)' options={{ headerShown: false, }} />
+        <Stack.Screen name='studentDrawer' options={{ headerShown: false, }} />
       </Stack>
     </AnimatedAppLoader>
   );
