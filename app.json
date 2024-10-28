@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.bazarof1.ucc_fit"
+      "package": "com.bazarof1.ucc_fit",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
