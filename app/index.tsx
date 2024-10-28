@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Text } from 'react-native';
 import { router } from 'expo-router';
 import LoginContent from "@/components/login/LoginContent";
 import auth from '@react-native-firebase/auth';
@@ -11,6 +12,7 @@ export default function login() {
 
   //Local state
   const [initializing, setInitializing] = useState(true);
+  const [signInError, setSignInError] = useState<string>('');
 
   // Handle user state changes
   function onAuthStateChanged(user: any) {
@@ -34,5 +36,9 @@ export default function login() {
 
   if (initializing) return null;
 
-  return <LoginContent onButtonPressed={signIn} />;
+  return(
+    <>
+      <LoginContent onButtonPressed={() => signIn(setSignInError)} signInError={signInError} />
+    </>
+  );
 }

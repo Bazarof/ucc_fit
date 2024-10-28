@@ -4,7 +4,7 @@ import auth from '@react-native-firebase/auth';
 import { router } from "expo-router";
 
 const AuthContext = createContext<{
-    signIn: () => Promise<any>;
+    signIn: (setErrorMessage: React.Dispatch<React.SetStateAction<string>>) => Promise<any>;
     signOut: () => Promise<void>;
     setSessionData: (session: any) => void;
     session?: any | null;
@@ -12,7 +12,7 @@ const AuthContext = createContext<{
 }>({
     signIn: async () => undefined,
     signOut: async () => {},
-    setSessionData: (user: any | null)=>{},
+    setSessionData: ()=>{},
     session: null,
     sessionRole: null,
 });
@@ -50,7 +50,7 @@ export function SessionProvider({children}:PropsWithChildren){
         return regex.test(email);
     }
 
-    async function handleSignIn() {
+    async function handleSignIn(setErrorMessage: React.Dispatch<React.SetStateAction<string>>) {
         try {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
             const response = await GoogleSignin.signIn();
@@ -67,6 +67,7 @@ export function SessionProvider({children}:PropsWithChildren){
     
                 }else{
                     //show modal or dialog box
+                    setErrorMessage('Utiliza tu cuenta institucional.');
                     await GoogleSignin.signOut();
                 }
     
