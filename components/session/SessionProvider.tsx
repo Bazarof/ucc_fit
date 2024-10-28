@@ -31,21 +31,18 @@ export function SessionProvider({children}:PropsWithChildren){
     const [sessionRole, setSessionRole] = useState<string | null>(null);
 
     function setSessionData(session: any) {
+        
         setSession(session);
-        //setSessionRole(determineRole(session.data?.email));
+
+        if(session !== null)
+            setSessionRole(determineRole(session.email));
     }
 
-    function determineRole(email: string | null) {
+    function determineRole(email: string) {
 
-        //let role = '';
-        if(email !== null){
+        const studentRegex = /^[0-9]+@ucc\.mx$/;
 
-            const studentRegex = /^[0-9]+@ucc\.mx$/;
-
-            return studentRegex.test(email) ? 'student' : 'coach';
-        }
-
-        return null;
+        return studentRegex.test(email) ? 'student' : 'coach';
     }
 
     function isUccDomain(email: string) {

@@ -4,41 +4,35 @@ import LoginContent from "@/components/login/LoginContent";
 import auth from '@react-native-firebase/auth';
 import { useSession } from "@/components/session/SessionProvider";
 
-export default function login(){
-    
-    //Context
-    const {signIn, setSessionData, session, sessionRole} = useSession();
+export default function login() {
 
-    //Local state
-    const [initializing, setInitializing] = useState(true);
+  //Context
+  const { signIn, setSessionData, session, sessionRole } = useSession();
 
-    //const routes = ['/studentDrawer', '/coachDrawer', '/nutritionistDrawer'];
+  //Local state
+  const [initializing, setInitializing] = useState(true);
 
-    // Handle user state changes
-    function onAuthStateChanged(user: any) {
-        setSessionData(user);
-        if (initializing) setInitializing(false);
+  // Handle user state changes
+  function onAuthStateChanged(user: any) {
+    setSessionData(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  useEffect(() => {
+    if (!initializing && session !== null) {
+      // Redirección basada en el rol
+      if (sessionRole === 'student')
+        router.replace('/studentDrawer');
+      
     }
+  }, [initializing, session, sessionRole, router]);
 
-    useEffect(() => {
-        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-        return subscriber; // unsubscribe on unmount
-      }, []);
+  if (initializing) return null;
 
-      if(initializing) return null;
-
-      if(session !== null){
-
-        // routes based on user role
-        //if(sessionRole === 'student')
-            router.replace('/studentDrawer');
-
-        //if(sessionRole === 'coach')
-        //    router.replace('/coachDrawer');
-        //if(sessionRole === 'student')
-        //    router.replace('/studentDrawer');
-        return null;
-      }
-
-    return <LoginContent onButtonPressed={signIn}/>;
+  return <LoginContent onButtonPressed={signIn} />;
 }
