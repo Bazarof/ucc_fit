@@ -4,7 +4,7 @@ import {Text, Image, StyleSheet } from 'react-native';
 const LoginButton = ({handleLogIn}:{handleLogIn: ()=> void}) => {
     return (
         <AnimatedLoginButton handleLogIn={handleLogIn}>
-            <Image style={styles.google_icon} source={require('../assets/images/icons/google.png')} />
+            <Image style={styles.google_icon} source={require('../../assets/images/icons/google.png')} />
             <Text style={styles.text_button}>Iniciar sesión</Text>
         </AnimatedLoginButton>);
 }

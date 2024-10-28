@@ -1,22 +1,10 @@
 import ButtonOption from "@/components/ButtonOption";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import auth from '@react-native-firebase/auth';
-import { router, useRouter } from "expo-router";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { useSession } from "@/components/session/SessionProvider";
 
 export default function configuracion() {
 
-    const router = useRouter();
-
-    async function handleSignOut(){
-        try{
-            await GoogleSignin.signOut();
-            await auth().signOut();
-            router.replace('/');
-        }catch(error){
-
-        }
-    }
+    const { signOut } = useSession();
 
     return <ScrollView style={styles.container_scroll}>
         <View style={styles.scroll_item_style}>
@@ -24,7 +12,7 @@ export default function configuracion() {
                 button_style={styles.button_style}
                 text_style={styles.text_style}
                 title='Cerrar sesión'
-                action={handleSignOut}/>
+                action={signOut}/>
         </View>
     </ScrollView>
 }

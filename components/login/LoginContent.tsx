@@ -4,7 +4,7 @@ import LoginButton from './LoginButton';
 const LoginContent = ({onButtonPressed}:{onButtonPressed: ()=> void}) => {
     return(<>
         <View style={styles.container}>
-            <Image style={{height: 120, width: 270}} source={require('../assets/images/logo-ucc.png')}/>
+            <Image style={{height: 120, width: 270}} source={require('../../assets/images/logo-ucc.png')}/>
             <Text style={styles.title}>UCC Fit</Text>
             <LoginButton handleLogIn={onButtonPressed}/>
         </View>
