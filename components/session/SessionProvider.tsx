@@ -66,6 +66,8 @@ export function SessionProvider({children}:PropsWithChildren){
                     return auth().signInWithCredential(googleCredential);
     
                 }else{
+                    
+            console.error("f");
                     //show modal or dialog box
                     setErrorMessage('Utiliza tu cuenta institucional.');
                     await GoogleSignin.signOut();
@@ -75,8 +77,8 @@ export function SessionProvider({children}:PropsWithChildren){
                 // signin was cancelled
             }
     
-        } catch (error) {
-            
+        } catch (error: Error | any) {
+            console.error(error.message);
             handleSignInError(error);
     
         }
