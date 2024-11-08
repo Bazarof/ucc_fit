@@ -8,15 +8,24 @@ import {
   ActivityIndicator,
 } from "react-native";
 import firestore, {
+  collection,
+  firebase,
   FirebaseFirestoreTypes,
 } from "@react-native-firebase/firestore";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
+import { Link } from "expo-router";
 
 const routinesCollection = firestore().collection("routines");
-console.log(routinesCollection);
+// const routinesCollection = collection(firestore(), "routines");
+// console.log(routinesCollection);
 
-export default function Rutina() {
-  const [routines, setRoutines] = useState<{ id: string; name?: string }[]>([]);
-  const [loading, setLoading] = useState(true);
+const Routines = () => {
+  const navigation = useNavigation();
+  const [routines, setRoutines] = useState<
+    { id: string; name?: string; description: string; exercises: object[] }[]
+  >([]);
+  const [loading, setLoading] = useState(false);
   const [lastDoc, setLastDoc] =
     useState<FirebaseFirestoreTypes.QueryDocumentSnapshot | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -28,14 +37,23 @@ export default function Rutina() {
       id: doc.id,
       ...doc.data(),
     }));
-    setRoutines(routinesList);
+    setRoutines(
+      routinesList as {
+        id: string;
+        name: string;
+        description: string;
+        exercises: object[];
+      }[]
+    );
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
     setLoading(false);
+    console.log(JSON.stringify(routines));
   };
 
   const fetchMoreRoutines = async () => {
     if (loadingMore || !lastDoc) return;
     setLoadingMore(true);
+    console.log("Loading more routines.");
     const snapshot = await routinesCollection
       .startAfter(lastDoc)
       .limit(10)
@@ -43,6 +61,8 @@ export default function Rutina() {
     const moreRoutines = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      description: doc.data().description,
+      exercises: doc.data().exercises,
     }));
     setRoutines((prevRoutines) => [...prevRoutines, ...moreRoutines]);
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
@@ -60,16 +80,24 @@ export default function Rutina() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Rutinas</Text>
+      {/* <Text style={styles.text}>Rutinas</Text> */}
       {loading ? (
         <ActivityIndicator size="large" />
       ) : (
         <FlatList
+          style={{ width: "100%", padding: 20 }}
           data={routines}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>{item.name}</Text>
+              <Link
+                href={{
+                  pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
+                  params: { id: item.id },
+                }}
+              >
+                {item.name}
+              </Link>
             </View>
           )}
           onEndReached={fetchMoreRoutines}
@@ -79,7 +107,7 @@ export default function Rutina() {
       )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -92,6 +120,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   item: {
+    flex: 1,
+    width: "100%",
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
@@ -100,3 +130,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
+
+export default Routines;
