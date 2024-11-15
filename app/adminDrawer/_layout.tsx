@@ -1,4 +1,4 @@
-import CustomDrawerContent from "@/components/navigation/CustomStudentDrawerContent";
+import CustomDrawerContent from "@/components/navigation/CustomAdminDrawerContent";
 import Drawer from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -17,30 +17,16 @@ export default function Layout() {
         }}
       >
         <Drawer.Screen
-          name="(tabs)/index"
+          name="index"
           options={{
-            title: "Inicio",
+            title: "Admin",
           }}
         />
         <Drawer.Screen
-          name="(tabs)/rutinas"
+          name="users"
           options={{
-            title: "Rutinas",
+            title: "Usuarios",
           }}
-        />
-        <Drawer.Screen
-          name="(tabs)/planalimenticio"
-          options={{
-            title: "Plan Alimenticio",
-          }}
-        />
-        <Drawer.Screen
-          name="(tabs)/estadisticas"
-          options={{ title: "Estadísticas" }}
-        />
-        <Drawer.Screen
-          name="(tabs)/configuracion"
-          options={{ title: "Configuración" }}
         />
       </Drawer>
     </GestureHandlerRootView>
