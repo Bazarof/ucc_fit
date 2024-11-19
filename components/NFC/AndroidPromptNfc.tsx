@@ -13,6 +13,7 @@ export interface AndroidPromptNfcRef {
 
 const AndroidPromptNfc = (props: any, ref: React.Ref<AndroidPromptNfcRef>) => {
 
+    const {onCancelPressed} = props;
     const [_visible, _setVisible] = useState(false);
     const [visible, setVisible] = useState(false);
     const [hintText, setHintText] = useState('');
@@ -66,10 +67,11 @@ const AndroidPromptNfc = (props: any, ref: React.Ref<AndroidPromptNfcRef>) => {
             <View style={styles.content}>
                 <Animated.View style={[styles.backdrop, StyleSheet.absoluteFill, backdropAnimStyle]} />
                 <Animated.View style={[styles.prompt, promptAnimStyle]}>
-                    <Text style={styles.hint}>{hintText || "Hello NFC!"}</Text>
+                    <Text style={styles.hint}>{hintText || "¡Hora de entrenar! 🏋️‍♂️💪"}</Text>
                     <Button style={styles.btn}
                         onPress={()=>{
                             _setVisible(false);
+                            onCancelPressed();
                         }}>
                         <Text style={{color: '#000', fontSize: 16}}>CANCELAR</Text>
                     </Button>

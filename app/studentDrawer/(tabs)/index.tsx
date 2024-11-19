@@ -1,7 +1,8 @@
-import { Text, View, StyleSheet } from 'react-native';
-import React, { useRef } from 'react';
+import { Text, View, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
 import { FAB } from 'react-native-paper';
 import AndroidPromptNfc, { AndroidPromptNfcRef } from '@/components/NFC/AndroidPromptNfc';
+import NfcManager, {NfcEvents} from 'react-native-nfc-manager';
 
 // Dark mode color #25292e
 
@@ -9,12 +10,31 @@ export default function home() {
 
   const modalRef = useRef<AndroidPromptNfcRef>(null);
 
-  const showModal = () => {
-    if (modalRef.current) {
-      modalRef.current.setVisible(true);  // Abre el modal
-      modalRef.current.setHintText("New NFC prompt!");  // Cambia el texto del hint
+  async function scanTag(){
+    await NfcManager.registerTagEvent();
+    if(Platform.OS === 'android'){
+      modalRef.current?.setVisible(true);
     }
-  };
+  }
+  
+  useEffect(() => {
+    NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
+      if(Platform.OS === 'android'){
+        
+        modalRef.current?.setHintText('Asistencia tomada...');
+
+        modalRef.current?.setVisible(false);
+      }else{
+        NfcManager.setAlertMessageIOS('Asistencia tomada...');
+      }
+      NfcManager.unregisterTagEvent().catch(()=>0);
+      console.warn('Tag found: ', tag);
+    });
+    
+    return () => {
+      NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -23,8 +43,12 @@ export default function home() {
         style={styles.fab}
         color='white'
         icon="account-check"
-        onPress={() => showModal()}/>
-      <AndroidPromptNfc ref={modalRef}/>
+        onPress={scanTag}
+        />
+      <AndroidPromptNfc ref={modalRef}
+        onCancelPressed={()=>{
+          NfcManager.unregisterTagEvent().catch(() => 0);
+        }}/>
     </View>
   );
 }
