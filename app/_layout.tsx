@@ -1,23 +1,48 @@
-import * as Font from 'expo-font';
 import AnimatedAppLoader from "../components/splash/AnimatedAppLoader";
-import LoginPage from '@/app';
 import { Stack } from 'expo-router';
 import { enableScreens } from 'react-native-screens';
 import { SessionProvider } from '@/components/session/SessionProvider';
+import { PaperProvider } from 'react-native-paper';
+import { useEffect, useState } from 'react';
+import NfcManager from "react-native-nfc-manager";
 enableScreens(true);
 // Keep the splash screen visible while we fetch resources
 //SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 
+  const [hasNfc, setHasNfc] = useState<boolean | null>(null);
+
+  useEffect(()=>{
+    
+    async function checkNfc(){
+      const supported = await NfcManager.isSupported();
+      if(supported){
+        await NfcManager.start();
+      }
+      setHasNfc(supported);
+    }
+
+    checkNfc();
+
+  },[]);
+
+  if(hasNfc === null){
+    return null;
+  }//else if(!hasNfc){
+    // Set other type of check attendance
+  //}
+
   return (
     <AnimatedAppLoader>
-      <SessionProvider>
-        <Stack>
-          <Stack.Screen name='index' options={{ headerShown: false, }} />
-          <Stack.Screen name='studentDrawer' options={{ headerShown: false, }} />
-        </Stack>
-      </SessionProvider>
+      <PaperProvider>
+        <SessionProvider>
+          <Stack>
+            <Stack.Screen name='index' options={{ headerShown: false, }} />
+            <Stack.Screen name='studentDrawer' options={{ headerShown: false, }} />
+          </Stack>
+        </SessionProvider>
+      </PaperProvider>
     </AnimatedAppLoader>
   );
 }
