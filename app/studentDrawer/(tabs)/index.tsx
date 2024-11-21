@@ -51,11 +51,16 @@ export default function home() {
 
   const modalRef = useRef<AndroidPromptNfcRef>(null);
 
-  const { session, isNfcEnabled } = useSession();
+  const { session, nfcEnabled, isNfcEnabled } = useSession();
 
   async function scanTag() {
-    await NfcManager.registerTagEvent();
-    if (Platform.OS === "android") {
+    if (nfcEnabled) {
+      await NfcManager.registerTagEvent();
+      if (Platform.OS === "android") {
+        modalRef.current?.setVisible(true);
+      }
+    }else {
+      // only android devices might not have nfc enabled
       modalRef.current?.setVisible(true);
     }
   }
