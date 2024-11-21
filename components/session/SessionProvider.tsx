@@ -40,20 +40,20 @@ export function SessionProvider({ children }: PropsWithChildren) {
       "1008981922683-jr7dplm8uher56f4qn3rf7e595bmgb3r.apps.googleusercontent.com",
   });
 
-    // Global session variables
-    const [session, setSession] = useState(null);
-    const [sessionRole, setSessionRole] = useState<string | null>(null);
-    const [nfcEnabled, setNfcEnabled] = useState<boolean | null>(null);
+  // Global session variables
+  const [session, setSession] = useState(null);
+  const [sessionRole, setSessionRole] = useState<string | null>(null);
+  const [nfcEnabled, setNfcEnabled] = useState<boolean | null>(null);
 
-    function isNfcEnabled(isNfcEnabled: boolean | null){
-        setNfcEnabled(isNfcEnabled);
-    }
+  function isNfcEnabled(isNfcEnabled: boolean | null) {
+    setNfcEnabled(isNfcEnabled);
+  }
 
   function setSessionData(session: any) {
     console.log("session", session);
     setSession(session);
 
-    // if (session !== null) setSessionRole(determineRole(session.email));
+  // if (session !== null) setSessionRole(determineRole(session.email));
   }
 
   //   function determineRole(email: string) {
@@ -130,7 +130,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
           await GoogleSignin.signOut();
         }
       } else {
-        // signin was cancelledte
+        // signin was cancelled
       }
     } catch (error: Error | any) {
       console.error(error.message);

@@ -36,11 +36,13 @@ export default function RootLayout() {
   return (
     <AnimatedAppLoader>
       <SessionProvider>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="studentDrawer" options={{ headerShown: false }} />
-          <Stack.Screen name="adminDrawer" options={{ headerShown: false }} />
-        </Stack>
+        <PaperProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="studentDrawer" options={{ headerShown: false }} />
+            <Stack.Screen name="adminDrawer" options={{ headerShown: false }} />
+          </Stack>
+        </PaperProvider>
       </SessionProvider>
     </AnimatedAppLoader>
   );

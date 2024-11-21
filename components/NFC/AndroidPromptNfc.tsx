@@ -89,7 +89,7 @@ const AndroidPromptNfc = (props: any, ref: React.Ref<AndroidPromptNfcRef>) => {
                             </Button>
                         </View>
                         :
-                        <View>
+                        <View style={{alignItems: 'center'}}>
                             <Text style={styles.hint}>{hintText || "Tomar asistencia"}</Text>
                             {
                                 // if user has checked attendance
