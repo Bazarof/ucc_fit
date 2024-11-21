@@ -49,11 +49,9 @@ const fetchLatestAttendance = async (studentId: string) => {
 
 export default function home() {
 
-  const {isNfcEnabled} = useSession();
-
   const modalRef = useRef<AndroidPromptNfcRef>(null);
 
-  const { session } = useSession();
+  const { session, isNfcEnabled } = useSession();
 
   async function scanTag() {
     await NfcManager.registerTagEvent();
@@ -78,12 +76,12 @@ export default function home() {
         modalRef.current?.setHintText('Asistencia tomada...');
         modalRef.current?.setCheckAttendance(true);
 
-        fetchLatestAttendance(session.uid)
+        fetchLatestAttendance(session!.uid)
           .then((attendance) => {
             console.log("Attendance", attendance);
 
             createAttendance(
-              session.uid,
+              session!.uid,
               attendance?.type === "in" ? "out" : "in"
             );
           })

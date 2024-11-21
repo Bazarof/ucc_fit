@@ -17,7 +17,7 @@ const AuthContext = createContext<{
   signOut: () => Promise<void>;
   setSessionData: (session: any) => void;
     isNfcEnabled: (isNfcEnabled: boolean | null) => void;
-  session?: User | null;
+  session?: User | null | undefined;
   sessionRole?: string | null;
     nfcEnabled: boolean | null;
 }>({

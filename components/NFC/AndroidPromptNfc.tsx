@@ -1,9 +1,6 @@
-import { transform } from "@babel/core";
 import { forwardRef, useState, useEffect, useRef, useImperativeHandle } from "react";
 import { View, Image, Text, Modal, StyleSheet, Dimensions, Animated } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { Button } from "react-native-paper";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import NfcManager, {NfcEvents} from 'react-native-nfc-manager';
 import { useSession } from "../session/SessionProvider";
 
@@ -53,10 +50,6 @@ const AndroidPromptNfc = (props: any, ref: React.Ref<AndroidPromptNfcRef>) => {
         }
     }, [_visible, animValue]);
 
-    // function handleCancel() {
-    //     setVisible(false);
-    //     setHintText('');
-    // }
     const backdropAnimStyle = {
         opacity: animValue
     };
