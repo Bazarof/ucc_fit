@@ -7,14 +7,18 @@ const AuthContext = createContext<{
     signIn: (setErrorMessage: React.Dispatch<React.SetStateAction<string>>) => Promise<any>;
     signOut: () => Promise<void>;
     setSessionData: (session: any) => void;
+    isNfcEnabled: (isNfcEnabled: boolean | null) => void;
     session?: any | null;
     sessionRole?: string | null;
+    nfcEnabled: boolean | null;
 }>({
     signIn: async () => undefined,
     signOut: async () => {},
-    setSessionData: ()=>{},
+    setSessionData: () => {},
+    isNfcEnabled: () => {},
     session: null,
     sessionRole: null,
+    nfcEnabled: null
 });
 
 export function useSession() {
@@ -29,6 +33,11 @@ export function SessionProvider({children}:PropsWithChildren){
     // Global session variables
     const [session, setSession] = useState(null);
     const [sessionRole, setSessionRole] = useState<string | null>(null);
+    const [nfcEnabled, setNfcEnabled] = useState<boolean | null>(null);
+
+    function isNfcEnabled(isNfcEnabled: boolean | null){
+        setNfcEnabled(isNfcEnabled);
+    }
 
     function setSessionData(session: any) {
         
@@ -116,9 +125,11 @@ export function SessionProvider({children}:PropsWithChildren){
             value={{
                 signIn: handleSignIn,
                 signOut: handleSignOut,
-                setSessionData: setSessionData, 
+                setSessionData: setSessionData,
+                isNfcEnabled: isNfcEnabled,
                 session: session,
                 sessionRole: sessionRole,
+                nfcEnabled: nfcEnabled,
             }}>
             {children}
         </AuthContext.Provider>

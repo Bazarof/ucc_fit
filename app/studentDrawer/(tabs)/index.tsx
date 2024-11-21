@@ -3,14 +3,18 @@ import React, { useEffect, useRef } from 'react';
 import { FAB } from 'react-native-paper';
 import AndroidPromptNfc, { AndroidPromptNfcRef } from '@/components/NFC/AndroidPromptNfc';
 import NfcManager, {NfcEvents} from 'react-native-nfc-manager';
+import { useSession } from '@/components/session/SessionProvider';
 
 // Dark mode color #25292e
 
 export default function home() {
 
+  const {isNfcEnabled} = useSession();
+
   const modalRef = useRef<AndroidPromptNfcRef>(null);
 
   async function scanTag(){
+
     await NfcManager.registerTagEvent();
     if(Platform.OS === 'android'){
       modalRef.current?.setVisible(true);
@@ -18,12 +22,25 @@ export default function home() {
   }
   
   useEffect(() => {
+
+    const checkNfcEnabled = async () => {
+      isNfcEnabled(await NfcManager.isEnabled());
+    };
+
+    checkNfcEnabled();
+
+    let timeOut: NodeJS.Timeout;
+
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
       if(Platform.OS === 'android'){
         
         modalRef.current?.setHintText('Asistencia tomada...');
+        modalRef.current?.setCheckAttendance(true);
 
-        modalRef.current?.setVisible(false);
+        timeOut = setTimeout(() => {
+          modalRef.current?.setVisible(false);
+        }, 2000);
+
       }else{
         NfcManager.setAlertMessageIOS('Asistencia tomada...');
       }
@@ -33,6 +50,7 @@ export default function home() {
     
     return () => {
       NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
+      clearTimeout(timeOut);
     };
   }, []);
 

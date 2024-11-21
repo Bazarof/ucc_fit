@@ -1,7 +1,7 @@
 import AnimatedAppLoader from "../components/splash/AnimatedAppLoader";
 import { Stack } from 'expo-router';
 import { enableScreens } from 'react-native-screens';
-import { SessionProvider } from '@/components/session/SessionProvider';
+import { SessionProvider, useSession } from '@/components/session/SessionProvider';
 import { PaperProvider } from 'react-native-paper';
 import { useEffect, useState } from 'react';
 import NfcManager from "react-native-nfc-manager";
