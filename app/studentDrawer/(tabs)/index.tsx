@@ -80,6 +80,8 @@ export default function home() {
 
   useEffect(() => {
 
+    checkNfcStatus();
+
     let timeOut: NodeJS.Timeout;
 
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
