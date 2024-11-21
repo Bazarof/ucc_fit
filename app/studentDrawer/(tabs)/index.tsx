@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Platform } from "react-native";
+import { Text, View, StyleSheet, Platform, AppState } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { FAB } from "react-native-paper";
 import AndroidPromptNfc, {
@@ -65,13 +65,20 @@ export default function home() {
     }
   }
 
+ // Verificar si NFC está habilitado
+ const checkNfcStatus = async () => {
+  const enabled = await NfcManager.isEnabled();
+  isNfcEnabled(enabled);
+};
+
+  // Detecta cuando la app regresa al primer plano
+  const handleAppStateChange = (nextAppState: any) => {
+    if (nextAppState === 'active') {
+      checkNfcStatus();  // Verifica el estado de NFC cuando la app vuelve al primer plano
+    }
+  };
+
   useEffect(() => {
-
-    const checkNfcEnabled = async () => {
-      isNfcEnabled(await NfcManager.isEnabled());
-    };
-
-    checkNfcEnabled();
 
     let timeOut: NodeJS.Timeout;
 
@@ -102,9 +109,11 @@ export default function home() {
       console.log("Tag found: ", tag);
     });
 
+    const appStateListener = AppState.addEventListener('change', handleAppStateChange);
+
     return () => {
       NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
-
+      appStateListener.remove();
       clearTimeout(timeOut);
     };
   }, []);
