@@ -89,9 +89,9 @@ export default function home() {
           })
           .catch(console.error);
 
-        timeout = setTimeout(() => {
+        timeOut = setTimeout(() => {
           modalRef.current?.setVisible(false);
-        }, 5000);
+        }, 2000);
       } else {
         NfcManager.setAlertMessageIOS("Asistencia tomada...");
       }
@@ -102,7 +102,7 @@ export default function home() {
     return () => {
       NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
 
-      clearTimeout(timeout);
+      clearTimeout(timeOut);
     };
   }, []);
 
