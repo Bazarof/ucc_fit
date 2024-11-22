@@ -22,5 +22,5 @@ export interface User {
   uid: string;
 
   campus: "torrente" | "calasanz";
-  role: "admin" | "student" | "coach" | "nutritionist";
+  role: "admin" | "student" | "trainer" | "nutritionist";
 }

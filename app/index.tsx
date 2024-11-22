@@ -41,7 +41,7 @@ export default function login() {
   useEffect(() => {
     if (!initializing && session !== null) {
       // Redirección basada en el rol
-      console.log("GOING TO STUDENT DRAWER WITH USER", session);
+      console.log("GOING TO DRAWER WITH USER", session);
 
       if (session) {
         switch (session.role) {
@@ -51,9 +51,9 @@ export default function login() {
           case "admin":
             router.replace("/adminDrawer");
             break;
-          // case "coach":
-          //   router.replace("/coachDrawer");
-          //   break;
+          case "trainer":
+            router.replace("/trainerDrawer");
+            break;
           // case "nutritionist":
           //   router.replace("/nutritionistDrawer");
           //   break;
