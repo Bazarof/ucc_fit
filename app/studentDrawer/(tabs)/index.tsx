@@ -7,6 +7,8 @@ import AndroidPromptNfc, {
 import NfcManager, { NfcEvents } from "react-native-nfc-manager";
 import { getFirestore } from "@react-native-firebase/firestore";
 import { useSession } from "@/components/session/SessionProvider";
+import CardView from "@/components/CardView";
+import { ScrollView } from "react-native-gesture-handler";
 
 // Dark mode color #25292e
 
@@ -122,7 +124,14 @@ export default function home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Dashboard</Text>
+      <ScrollView style={styles.scrollview}>
+        <CardView>
+          <Text>Progreso</Text>
+          <Text>Barra de progreso ---------</Text>
+        </CardView>
+        <Text style={styles.text}>Dashboard</Text>
+
+      </ScrollView>
       <FAB
         style={styles.fab}
         color="white"
@@ -142,8 +151,9 @@ export default function home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  scrollview: {
+    flex: 1,
   },
   text: {
     fontSize: 30,

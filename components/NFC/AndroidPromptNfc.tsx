@@ -105,18 +105,16 @@ const AndroidPromptNfc = (props: any, ref: React.Ref<AndroidPromptNfcRef>) => {
                                             source={require('../../assets/images/icons/mobile-pay.png')} />
                                         <Text style={styles.textNfc}>(Acerca el celular al icono)</Text>
                                     </View>
-
                             }
                             <Button style={styles.btn}
                                 onPress={() => {
                                     _setVisible(false);
                                     onCancelPressed();
                                 }}>
-                                <Text style={{ color: '#000', fontSize: 16 }}>CANCELAR</Text>
+                                <Text style={{ color: '#000', fontSize: 16 }}>{checkAttendance ? "CERRAR" : "CANCELAR"}</Text>
                             </Button>
                         </View>
                     }
-
 
                 </Animated.View>
             </View>
@@ -140,7 +138,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         width: Dimensions.get('window').width - 2 * 20,
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 15,
         paddingVertical: 60,
         paddingHorizontal: 20,
         alignItems: 'center',
