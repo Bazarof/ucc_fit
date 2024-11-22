@@ -74,7 +74,7 @@ export default function CustomDrawerContent(props: any) {
               router.push("/trainerDrawer/students");
             }}
             style={{
-              backgroundColor: pathName === "/users" ? "#E3E3E3" : "#fff",
+              backgroundColor: pathName === "/students" ? "#E3E3E3" : "#fff",
             }}
           />
 
@@ -94,7 +94,27 @@ export default function CustomDrawerContent(props: any) {
               router.push("/trainerDrawer/exercises");
             }}
             style={{
-              backgroundColor: pathName === "/users" ? "#E3E3E3" : "#fff",
+              backgroundColor: pathName === "/exercises" ? "#E3E3E3" : "#fff",
+            }}
+          />
+
+          <DrawerItem
+            icon={() => (
+              <Image
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                source={require("../../assets/images/icons/dumbell.png")}
+              />
+            )}
+            label={"Rutinas"}
+            labelStyle={{ fontSize: 20, color: "#000" }}
+            onPress={() => {
+              router.push("/trainerDrawer/routines");
+            }}
+            style={{
+              backgroundColor: pathName === "/routines" ? "#E3E3E3" : "#fff",
             }}
           />
 
