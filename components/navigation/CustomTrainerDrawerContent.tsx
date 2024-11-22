@@ -78,6 +78,26 @@ export default function CustomDrawerContent(props: any) {
             }}
           />
 
+          <DrawerItem
+            icon={() => (
+              <Image
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                source={require("../../assets/images/icons/dumbell.png")}
+              />
+            )}
+            label={"Ejercicios"}
+            labelStyle={{ fontSize: 20, color: "#000" }}
+            onPress={() => {
+              router.push("/trainerDrawer/exercises");
+            }}
+            style={{
+              backgroundColor: pathName === "/users" ? "#E3E3E3" : "#fff",
+            }}
+          />
+
           {/* <DrawerItem
             icon={() => (
               <Image

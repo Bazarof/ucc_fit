@@ -28,6 +28,12 @@ export default function Layout() {
             title: "Estudiantes",
           }}
         />
+        <Drawer.Screen
+          name="exercises"
+          options={{
+            title: "Ejercicios",
+          }}
+        />
 
         <Drawer.Screen
           name="configuracion"
