@@ -4,7 +4,7 @@ import { getFirestore } from "@react-native-firebase/firestore";
 export const getAllExercises = async (): Promise<Exercise[]> => {
   const exerciseCollection = getFirestore().collection("exercises");
   const exercises = await exerciseCollection.get();
-  return exercises.docs.map((doc) => doc.data() as Exercise);
+  return exercises.docs.map((doc) => ({ uid: doc.id, ...doc.data() }) as Exercise);
 };
 
 export const getExercise = async (id: string): Promise<Exercise> => {

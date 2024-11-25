@@ -39,3 +39,12 @@ export const getStudentsWithoutRoutine = async (): Promise<number> => {
         return 0;
     }
 };
+
+export const createRoutine = async (routine: Routine): Promise<void> => {
+    try {
+        await getFirestore().collection("routines").add(routine);
+    } catch (error) {
+        console.error("Error creating routine:", error);
+    }
+}
+

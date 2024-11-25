@@ -91,6 +91,7 @@ export default function TrainerRoutinesIndex() {
     <ResourceList<Routine>
       collectionName="routines"
       itemRenderer={(item) => <RoutineItem {...item} />}
+      createRoute={"/trainerDrawer/routines/create"}
     />
   );
 }
