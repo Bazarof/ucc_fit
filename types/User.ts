@@ -1,5 +1,3 @@
-import { FirebaseAuthTypes } from "@react-native-firebase/auth";
-
 export interface User {
   displayName: string | null;
   email: string | null;
@@ -22,5 +20,5 @@ export interface User {
   uid: string;
 
   campus: "torrente" | "calasanz";
-  role: "admin" | "student" | "coach" | "nutritionist";
+  role: "admin" | "student" | "trainer" | "nutritionist";
 }
