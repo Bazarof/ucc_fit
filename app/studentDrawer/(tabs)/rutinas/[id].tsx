@@ -56,7 +56,7 @@ const Routine = () => {
   return (
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator color={'#007FAF'} size="large" />
       ) : (
         <>
           <Text style={{ fontSize: 18 }}>{routine.name}</Text>
