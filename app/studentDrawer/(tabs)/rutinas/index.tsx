@@ -15,6 +15,7 @@ import firestore, {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { Link } from "expo-router";
+import CardView from "@/components/CardView";
 
 const routinesCollection = firestore().collection("routines");
 // const routinesCollection = collection(firestore(), "routines");
@@ -85,20 +86,28 @@ const Routines = () => {
         <ActivityIndicator size="large" />
       ) : (
         <FlatList
-          style={{ width: "100%", padding: 20 }}
+          style={{ width: "100%", paddingTop: 10}}
           data={routines}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Link
-                href={{
-                  pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
-                  params: { id: item.id },
-                }}
-              >
+            <CardView>
+              <Link href={{
+                pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
+                params: { id: item.id }
+              }}>
                 {item.name}
               </Link>
-            </View>
+            </CardView>
+            //<View style={styles.item}>
+            //  <Link
+            //    href={{
+            //      pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
+            //      params: { id: item.id },
+            //    }}
+            //  >
+            //    {item.name}
+            //  </Link>
+            //</View>
           )}
           onEndReached={fetchMoreRoutines}
           onEndReachedThreshold={0.5}
@@ -114,6 +123,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  linkContainer: {
+    flex: 1,
+    backgroundColor: 'green'
   },
   text: {
     fontSize: 30,

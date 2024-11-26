@@ -1,6 +1,6 @@
-import { Text, View, StyleSheet, Platform, AppState } from "react-native";
-import React, { useEffect, useRef } from "react";
-import { FAB } from "react-native-paper";
+import { Text, View, Image, StyleSheet, Platform, AppState } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { FAB, ProgressBar } from "react-native-paper";
 import AndroidPromptNfc, {
   AndroidPromptNfcRef,
 } from "@/components/NFC/AndroidPromptNfc";
@@ -9,6 +9,7 @@ import { getFirestore } from "@react-native-firebase/firestore";
 import { useSession } from "@/components/session/SessionProvider";
 import CardView from "@/components/CardView";
 import { ScrollView } from "react-native-gesture-handler";
+import TagContainer from "@/components/TagContainer";
 
 // Dark mode color #25292e
 
@@ -51,9 +52,16 @@ const fetchLatestAttendance = async (studentId: string) => {
 
 export default function home() {
 
+  // Ref to modal
   const modalRef = useRef<AndroidPromptNfcRef>(null);
 
+  // session values
   const { session, nfcEnabled, isNfcEnabled } = useSession();
+
+  // home variables
+  const [progreso, setProgreso] = useState(0);
+  const [sesiones, setSesiones] = useState(14);
+  const [totalSesiones, setTotalSesiones] = useState(19);
 
   async function scanTag() {
     if (nfcEnabled) {
@@ -81,6 +89,8 @@ export default function home() {
   };
 
   useEffect(() => {
+    // hardcoded
+    setProgreso(sesiones / totalSesiones);
 
     checkNfcStatus();
 
@@ -123,13 +133,107 @@ export default function home() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollview}>
+    <View style={[styles.container]}>
+      <ScrollView style={[styles.scrollview,]}>
+
+        {/* Mi entrenamiento */}
         <CardView>
-          <Text>Progreso</Text>
-          <Text>Barra de progreso ---------</Text>
+
+          <View style={[styles.container]}>
+            <Text style={styles.title}>Mi entrenamiento</Text>
+          </View>
+
+          <View style={[styles.container, {flexDirection: 'row'}]}>
+            <View style={[styles.container]}>
+              <Text style={[styles.progressTitle,]}>{(Math.floor(progreso*100)) + '%'}</Text>
+            </View>
+            <View style={[styles.container, {justifyContent: 'flex-end',}]}>
+              <Text style={styles.textSesiones}>{sesiones + '/' + totalSesiones + ' sesiones'}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.container, {width: '100%'}]}>
+            <ProgressBar progress={progreso} style={styles.progressBar} color= "#007FAF"/>
+          </View>
+
         </CardView>
-        <Text style={styles.text}>Dashboard</Text>
+
+        {/* Tu rutina */}
+        <CardView>
+
+          <View style={[styles.container]}>
+            <Text style={styles.title}>Seguimiento</Text>
+          </View>
+
+          <View style={[styles.container, {flexDirection: 'row', marginBottom: 15}]}>
+
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <Image style={{width: 42, height: 42, marginTop: 15, marginEnd: 10}} source={require('../../../assets/images/icons/dumbell.png')}/>
+              <View style={[styles.container]}>
+                <Text style={styles.text}>0</Text>
+                <Text style={{lineHeight: 25}}>
+                  {'Semanas de '}
+                  {'entrenamiento '}
+                  {'consecutivas'}
+                </Text>
+              </View>
+            </View>
+
+      
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+
+                <View style={{height: '100%', padding: 7}}>
+                  <Image style={{height: 30, width: 30}} source={require('../../../assets/images/icons/yellow-status.png')}/>
+                </View>
+
+                <View style={[styles.container]}>
+                  <Text style={[styles.text,]}>Medio</Text>
+                  <Text style={{ lineHeight: 25 }}>
+                    {'Compromiso con el '}
+                    {'entrenamiento'}
+                  </Text>
+                </View>
+              </View>
+
+          </View>
+
+          <View style={styles.conatinerStatus}>
+            <Text style={styles.textStatus}>¡Estás en el camino correcto :)!</Text>
+          </View>
+
+        </CardView>
+
+        <CardView>
+          <View style={[styles.container, {marginBottom: 20}]}>
+            <Text style={[styles.title]}>En el último mes</Text>
+          </View>
+
+          <View style={[styles.container,
+          {
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }]}>
+            <View style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: '#F2F2F2',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 15 
+            }}>
+              <Text style={{fontSize: 32}}>4</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#525252', textAlign: 'center' }}>
+                {'Entrenamientos\n'}
+                {'completados'}
+              </Text>
+            </View>
+          </View>
+
+        </CardView>
 
       </ScrollView>
       <FAB
@@ -152,12 +256,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  conatinerStatus: {
+    width: '100%',
+    borderRadius: 10,
+    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10
+  },
   scrollview: {
     flex: 1,
+    paddingTop: 10,
+    paddingBottom: 10
   },
   text: {
     fontSize: 30,
     fontWeight: "bold",
+  },
+  textSesiones: {
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#525252'
+  },
+  textStatus: {
+    fontWeight: 'bold',
+    color: '#007FAF'
   },
   button: {
     fontSize: 20,
@@ -171,4 +296,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  title: {
+    fontSize: 25,
+  },
+  progressTitle: {
+    fontSize: 50,
+    fontWeight: 'bold',
+  },
+  progressBar: {
+    width: '100%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#F2F2F2'
+  },
+ 
 });

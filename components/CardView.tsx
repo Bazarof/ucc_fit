@@ -13,13 +13,13 @@ export default function CardView({children} : {children: any}) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        paddingTop: 20,
+        paddingTop: 10,
         paddingStart: 20,
         paddingEnd: 20,
         paddingBottom: 10,
-        //backgroundColor: 'green'
     },
     card: {
+        flex: 1,
         borderRadius: 15,
         backgroundColor: 'white',
         padding: 20,
