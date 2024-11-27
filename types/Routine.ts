@@ -7,4 +7,6 @@ export default interface Routine extends Resource {
   user: string;
   nutritionist: string;
   exercises: Exercise[];
+  intensity: number;
+  sessions: number;
 }
