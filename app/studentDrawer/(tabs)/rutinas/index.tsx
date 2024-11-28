@@ -3,6 +3,7 @@ import {
   Button,
   StyleSheet,
   View,
+  Image,
   Text,
   FlatList,
   ActivityIndicator,
@@ -89,15 +90,25 @@ const Routines = () => {
           style={{ width: "100%", paddingTop: 10}}
           data={routines}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <CardView>
-              <Link href={{
-                pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
-                params: { id: item.id }
-              }}>
-                {item.name}
-              </Link>
-            </CardView>
+            renderItem={({ item }) => (
+              <CardView>
+                <Link style={[styles.linkContainer, {flexDirection: 'row'}]} href={{
+                  pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
+                  params: { id: item.id }
+                }}>
+                  <View>
+                    <Image style={{width: 60, height: 60}} source={require('../../../../assets/images/icons/calentamiento.png')}/>
+                  </View>
+                  <View style={[{flex: 1}]}>
+                    <View style= {[{flex: 1}]}>
+                      <Text style={{backgroundColor: 'green'}}>{item.name}</Text>
+                    </View>
+                    <View style= {[{flex: 1, flexDirection: 'row'}]}>
+                      <Text>01:30 hr</Text>
+                    </View>
+                  </View>
+                </Link>
+              </CardView>
             //<View style={styles.item}>
             //  <Link
             //    href={{
@@ -126,7 +137,8 @@ const styles = StyleSheet.create({
   },
   linkContainer: {
     flex: 1,
-    backgroundColor: 'green'
+    width: '100%',
+    //backgroundColor: 'green'
   },
   text: {
     fontSize: 30,
