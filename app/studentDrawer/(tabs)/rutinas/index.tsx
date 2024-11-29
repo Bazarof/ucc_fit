@@ -15,8 +15,9 @@ import firestore, {
 } from "@react-native-firebase/firestore";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import CardView from "@/components/CardView";
+import LevelIcon from "@/components/LevelIcon";
 
 const routinesCollection = firestore().collection("routines");
 // const routinesCollection = collection(firestore(), "routines");
@@ -87,41 +88,39 @@ const Routines = () => {
         <ActivityIndicator size="large" />
       ) : (
         <FlatList
-          style={{ width: "100%", paddingTop: 10}}
+          style={{ flex: 1, paddingTop: 10}}
           data={routines}
           keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <CardView>
-                <Link style={[styles.linkContainer, {flexDirection: 'row'}]} href={{
-                  pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
-                  params: { id: item.id }
+                <TouchableOpacity style={[styles.linkContainer, {}]} onPress={() => {
+                  router.navigate({
+                    pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
+                    params: { id: item.id }
+                  });
                 }}>
-                  <View>
-                    <Image style={{width: 60, height: 60}} source={require('../../../../assets/images/icons/calentamiento.png')}/>
-                  </View>
-                  <View style={[{flex: 1}]}>
-                    <View style= {[{flex: 1}]}>
-                      <Text style={{backgroundColor: 'green'}}>{item.name}</Text>
+
+                  <View style={{ width: '100%', flexDirection: 'row'}}>
+                    <View>
+                      <Image style={{height: 60, width: 60}} source={require('../../../../assets/images/icons/calentamiento.png')}/>
                     </View>
-                    <View style= {[{flex: 1, flexDirection: 'row'}]}>
-                      <Text>01:30 hr</Text>
+                    <View style={{flex: 1, height: '100%'}}>
+                      <View style={{width: '100%', marginBottom: 5}}><Text style={styles.cardTitle}>{item.name}</Text></View>
+                      <View style={{width: '100%', flexDirection: 'row'}}>
+                        <View style={{flex: 1}}><LevelIcon/></View>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          <Image style={{height: 20, width: 20, alignSelf: 'center', marginEnd: 5}} source={require('../../../../assets/images/icons/clock.png')}/>
+                          <Text style={styles.cardText}>01:30 hr</Text>
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </Link>
+
+                </TouchableOpacity>
               </CardView>
-            //<View style={styles.item}>
-            //  <Link
-            //    href={{
-            //      pathname: `/studentDrawer/(tabs)/rutinas/[id]`,
-            //      params: { id: item.id },
-            //    }}
-            //  >
-            //    {item.name}
-            //  </Link>
-            //</View>
-          )}
-          onEndReached={fetchMoreRoutines}
-          onEndReachedThreshold={0.5}
+            )}
+            onEndReached={fetchMoreRoutines}
+            onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
         />
       )}
@@ -132,13 +131,19 @@ const Routines = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
   linkContainer: {
-    flex: 1,
-    width: '100%',
+    flexDirection: 'row',
+    width: '100%'
     //backgroundColor: 'green'
+  },
+  cardTitle: {
+    fontWeight: 'bold',
+    fontSize: 26,
+    alignSelf: 'flex-end'
+  },
+  cardText: {
+    fontSize: 18,
   },
   text: {
     fontSize: 30,
