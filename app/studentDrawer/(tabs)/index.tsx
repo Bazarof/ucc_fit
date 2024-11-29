@@ -5,50 +5,15 @@ import AndroidPromptNfc, {
   AndroidPromptNfcRef,
 } from "@/components/NFC/AndroidPromptNfc";
 import NfcManager, { NfcEvents } from "react-native-nfc-manager";
-import { getFirestore } from "@react-native-firebase/firestore";
 import { useSession } from "@/components/session/SessionProvider";
 import CardView from "@/components/CardView";
 import { ScrollView } from "react-native-gesture-handler";
 import TagContainer from "@/components/TagContainer";
+import { createAttendance, fetchLatestAttendance, getCompletedSessionsByUser, getUserConsecutiveWeeks } from "@/services/attendanceService";
+import { getUserCurrentRoutine } from "@/services/routineService";
+import Routine from "@/types/Routine";
 
 // Dark mode color #25292e
-
-const attendanceCollection = getFirestore().collection("attendance");
-
-const createAttendance = async (
-  studentId: string,
-  type: "in" | "out" = "in"
-) => {
-  const attendance = await attendanceCollection.add({
-    user: `users/${studentId}`,
-    created_at: new Date(),
-    type,
-  });
-
-  return attendance.id;
-};
-
-const fetchLatestAttendance = async (studentId: string) => {
-  // get the latest attendance that happened within the current day
-
-  const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const endOfDay = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 1
-  );
-
-  const attendance = await attendanceCollection
-    .where("user", "==", `users/${studentId}`)
-    .where("created_at", ">=", startOfDay)
-    .where("created_at", "<", endOfDay)
-    .orderBy("created_at", "desc")
-    .limit(1)
-    .get();
-
-  return attendance.docs[0]?.data();
-};
 
 export default function home() {
 
@@ -60,8 +25,12 @@ export default function home() {
 
   // home variables
   const [progreso, setProgreso] = useState(0);
-  const [sesiones, setSesiones] = useState(14);
-  const [totalSesiones, setTotalSesiones] = useState(19);
+  const [sesiones, setSesiones] = useState(0);
+  const [totalSesiones, setTotalSesiones] = useState(0);
+  const [consecutiveWeeks, setConsecutiveWeeks] = useState(0);
+
+  const [currentRoutine, setCurrentRoutine] = useState<Routine | null>(null);
+  const [sessionsThisMonth, setSessionsThisMonth] = useState(0);
 
   async function scanTag() {
     if (nfcEnabled) {
@@ -69,17 +38,17 @@ export default function home() {
       if (Platform.OS === "android") {
         modalRef.current?.setVisible(true);
       }
-    }else {
+    } else {
       // only android devices might not have nfc enabled
       modalRef.current?.setVisible(true);
     }
   }
 
- // Verificar si NFC está habilitado
- const checkNfcStatus = async () => {
-  const enabled = await NfcManager.isEnabled();
-  isNfcEnabled(enabled);
-};
+  // Verificar si NFC está habilitado
+  const checkNfcStatus = async () => {
+    const enabled = await NfcManager.isEnabled();
+    isNfcEnabled(enabled);
+  };
 
   // Detecta cuando la app regresa al primer plano
   const handleAppStateChange = (nextAppState: any) => {
@@ -89,16 +58,33 @@ export default function home() {
   };
 
   useEffect(() => {
-    // hardcoded
-    setProgreso(sesiones / totalSesiones);
+    try {
+      Promise.all([
+        getCompletedSessionsByUser(session!.uid),
+        getUserCurrentRoutine(session!.uid),
+      ]).then(([completedSessions, routine]) => {
+        setSesiones(completedSessions);
+        setTotalSesiones(routine?.sessions || 0);
+        setSessionsThisMonth(completedSessions);
+        setProgreso(completedSessions / (routine?.sessions || 1));
+        setCurrentRoutine(routine);
+      });
+
+      getUserConsecutiveWeeks(session!.uid).then((weeks) => {
+        setConsecutiveWeeks(weeks);
+      });
+
+    } catch (error) {
+      console.error("Error fetching user's current routine:", error);
+    }
 
     checkNfcStatus();
 
     let timeOut: NodeJS.Timeout;
 
     NfcManager.setEventListener(NfcEvents.DiscoverTag, (tag: any) => {
-      if(Platform.OS === 'android'){
-        
+      if (Platform.OS === 'android') {
+
         modalRef.current?.setHintText('Asistencia tomada...');
         modalRef.current?.setCheckAttendance(true);
 
@@ -143,17 +129,17 @@ export default function home() {
             <Text style={styles.title}>Mi entrenamiento</Text>
           </View>
 
-          <View style={[styles.container, {flexDirection: 'row'}]}>
+          <View style={[styles.container, { flexDirection: 'row' }]}>
             <View style={[styles.container]}>
-              <Text style={[styles.progressTitle,]}>{(Math.floor(progreso*100)) + '%'}</Text>
+              <Text style={[styles.progressTitle,]}>{(Math.floor(progreso * 100)) + '%'}</Text>
             </View>
-            <View style={[styles.container, {justifyContent: 'flex-end',}]}>
+            <View style={[styles.container, { justifyContent: 'flex-end', }]}>
               <Text style={styles.textSesiones}>{sesiones + '/' + totalSesiones + ' sesiones'}</Text>
             </View>
           </View>
 
-          <View style={[styles.container, {width: '100%'}]}>
-            <ProgressBar progress={progreso} style={styles.progressBar} color= "#007FAF"/>
+          <View style={[styles.container, { width: '100%' }]}>
+            <ProgressBar progress={progreso} style={styles.progressBar} color="#007FAF" />
           </View>
 
         </CardView>
@@ -165,13 +151,13 @@ export default function home() {
             <Text style={styles.title}>Seguimiento</Text>
           </View>
 
-          <View style={[styles.container, {flexDirection: 'row', marginBottom: 15}]}>
+          <View style={[styles.container, { flexDirection: 'row', marginBottom: 15 }]}>
 
             <View style={{ flex: 1, flexDirection: 'row' }}>
-              <Image style={{width: 42, height: 42, marginTop: 15, marginEnd: 10}} source={require('../../../assets/images/icons/dumbell.png')}/>
+              <Image style={{ width: 42, height: 42, marginTop: 15, marginEnd: 10 }} source={require('../../../assets/images/icons/dumbell.png')} />
               <View style={[styles.container]}>
-                <Text style={styles.text}>0</Text>
-                <Text style={{lineHeight: 25}}>
+                <Text style={styles.text}>{consecutiveWeeks}</Text>
+                <Text style={{ lineHeight: 25 }}>
                   {'Semanas de '}
                   {'entrenamiento '}
                   {'consecutivas'}
@@ -179,21 +165,21 @@ export default function home() {
               </View>
             </View>
 
-      
-              <View style={{ flex: 1, flexDirection: 'row' }}>
 
-                <View style={{height: '100%', padding: 7}}>
-                  <Image style={{height: 30, width: 30}} source={require('../../../assets/images/icons/yellow-status.png')}/>
-                </View>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
 
-                <View style={[styles.container]}>
-                  <Text style={[styles.text,]}>Medio</Text>
-                  <Text style={{ lineHeight: 25 }}>
-                    {'Compromiso con el '}
-                    {'entrenamiento'}
-                  </Text>
-                </View>
+              <View style={{ height: '100%', padding: 7 }}>
+                <Image style={{ height: 30, width: 30 }} source={require('../../../assets/images/icons/yellow-status.png')} />
               </View>
+
+              <View style={[styles.container]}>
+                <Text style={[styles.text,]}>Medio</Text>
+                <Text style={{ lineHeight: 25 }}>
+                  {'Compromiso con el '}
+                  {'entrenamiento'}
+                </Text>
+              </View>
+            </View>
 
           </View>
 
@@ -204,7 +190,7 @@ export default function home() {
         </CardView>
 
         <CardView>
-          <View style={[styles.container, {marginBottom: 20}]}>
+          <View style={[styles.container, { marginBottom: 20 }]}>
             <Text style={[styles.title]}>En el último mes</Text>
           </View>
 
@@ -221,9 +207,9 @@ export default function home() {
               backgroundColor: '#F2F2F2',
               justifyContent: 'center',
               alignItems: 'center',
-              marginBottom: 15 
+              marginBottom: 15
             }}>
-              <Text style={{fontSize: 32}}>4</Text>
+              <Text style={{ fontSize: 32 }}>{sessionsThisMonth}</Text>
             </View>
             <View>
               <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#525252', textAlign: 'center' }}>
@@ -309,5 +295,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#F2F2F2'
   },
- 
+
 });
