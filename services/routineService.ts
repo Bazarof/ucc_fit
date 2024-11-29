@@ -48,3 +48,21 @@ export const createRoutine = async (routine: Routine): Promise<void> => {
     }
 }
 
+export const getUserCurrentRoutine = async (userId: string): Promise<Routine | null> => {
+    try {
+        console.log("userId", userId);
+        const routineSnapshot = await getFirestore()
+            .collection("routines")
+            .where("user", "==", `users/${userId}`)
+            .get();
+
+        if (routineSnapshot.empty) {
+            return null;
+        }
+
+        return routineSnapshot.docs[0].data() as Routine;
+    } catch (error) {
+        console.error("Error fetching user's current routine:", error);
+        return null;
+    }
+}
