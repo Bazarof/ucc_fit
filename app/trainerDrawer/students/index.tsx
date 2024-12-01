@@ -1,74 +1,116 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
-  Button,
+  ActivityIndicator,
+  FlatList,
   StyleSheet,
+  TextInput,
   View,
   Text,
-  FlatList,
-  ActivityIndicator,
 } from "react-native";
 import firestore, {
-  collection,
   firebase,
   FirebaseFirestoreTypes,
 } from "@react-native-firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { User } from "@/types/User";
+import { getUserCurrentRoutine } from "@/services/routineService";
 
 const studentsCollection = firestore().collection("users");
 
 const Students = () => {
-  const navigation = useNavigation();
   const [students, setStudents] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastDoc, setLastDoc] =
     useState<FirebaseFirestoreTypes.QueryDocumentSnapshot | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
-  const auth = firebase.auth();
-  // const admin = firebase.auth().listUsers();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [routinesMap, setRoutinesMap] = useState<Record<string, boolean>>({});
 
-  const fetchStudents = async () => {
+  // Fetch initial students
+  const fetchStudents = async (query = "") => {
     setLoading(true);
 
-    const snapshot = await studentsCollection
-      .limit(10)
-      .where("role", "==", "student")
-      .get();
+    let querySnapshot = studentsCollection.where("role", "==", "student");
+    if (query) {
+      querySnapshot = querySnapshot
+        .where("displayName", ">=", query)
+        .where("displayName", "<=", query + "\uf8ff");
+    }
+
+    const snapshot = await querySnapshot.limit(10).get();
     const studentsList = snapshot.docs.map(
       (doc) =>
-        ({
-          uid: doc.id,
-          ...doc.data(),
-        } as unknown as User)
+      ({
+        uid: doc.id,
+        ...doc.data(),
+      } as unknown as User)
     );
 
-    setStudents(studentsList as User[]);
+    setStudents(studentsList);
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
     setLoading(false);
-    console.log(JSON.stringify(students));
+
+    fetchRoutinesForStudents(studentsList);
   };
 
+  // Fetch more students for pagination
   const fetchMoreStudents = async () => {
-    if (loadingMore || !lastDoc) return;
+    if (loadingMore || !lastDoc || searching) return;
     setLoadingMore(true);
-    console.log("Loading more students.");
+
     const snapshot = await studentsCollection
       .startAfter(lastDoc)
       .limit(10)
       .where("role", "==", "student")
       .get();
-    const moreStudents: any = snapshot.docs.map((doc) => ({
+
+    const moreStudents = snapshot.docs.map((doc) => ({
       uid: doc.id,
       ...doc.data(),
-      // name: doc.data().name,
-      // campus: doc.data().campus,
-      // description: doc.data().description,
-      // exercises: doc.data().exercises,
-    }));
-    setStudents((prevStudents) => [...prevStudents, ...moreStudents]);
+    }) as User);
+
+    setStudents((prev) => [...prev, ...moreStudents]);
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
     setLoadingMore(false);
+
+    fetchRoutinesForStudents(moreStudents);
+  };
+
+  // Fetch routine status for each student
+  const fetchRoutinesForStudents = async (studentsList: User[]) => {
+    const routinesStatus: Record<string, boolean> = { ...routinesMap };
+    for (const student of studentsList) {
+      const hasRoutine = (await getUserCurrentRoutine(student.uid)) !== null;
+      routinesStatus[student.uid] = hasRoutine;
+    }
+    setRoutinesMap(routinesStatus);
+  };
+
+  // Custom debounce function
+  const debounce = (func: (...args: any[]) => void, delay: number) => {
+    let timer: NodeJS.Timeout;
+    return (...args: any[]) => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  // Debounced search handler
+  const handleSearchDebounced = useCallback(
+    debounce((query: string) => {
+      setSearching(true);
+      fetchStudents(query).finally(() => setSearching(false));
+    }, 1000),
+    []
+  );
+
+  // Handle search input change
+  const handleSearch = (text: string) => {
+    setSearchTerm(text);
+    handleSearchDebounced(text.trim());
   };
 
   useEffect(() => {
@@ -82,31 +124,44 @@ const Students = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.text}>Rutinas</Text> */}
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          style={{ width: "100%", padding: 20 }}
-          data={students}
-          keyExtractor={(item) => item.uid}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Link
-                href={{
-                  pathname: `/trainerDrawer/students/[id]`,
-                  params: { id: item.uid },
-                }}
-              >
-                {item.displayName}
-              </Link>
-            </View>
-          )}
-          onEndReached={fetchMoreStudents}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-        />
-      )}
+      <TextInput
+        style={styles.searchBox}
+        placeholder="Search students by name"
+        value={searchTerm}
+        onChangeText={handleSearch}
+      />
+      <View style={{ flex: 1, width: "100%" }}>
+        {loading || searching ? (
+          <View style={{ flex: 1, borderWidth: 1, justifyContent: "center", alignItems: "center" }}>
+            <ActivityIndicator size="large" />
+          </View>
+        ) : (
+          <FlatList
+            style={{ width: "100%", padding: 20 }}
+            data={students}
+            keyExtractor={(item) => item.uid}
+            renderItem={({ item }) => (
+              <View style={styles.item}>
+                <Link
+                  href={{
+                    pathname: `/trainerDrawer/students/[id]`,
+                    params: { id: item.uid },
+                  }}
+                >
+                  <Text>
+                    {item.displayName}{" "}
+                    {routinesMap[item.uid] !== undefined &&
+                      (routinesMap[item.uid] ? "(Has Routine)" : "(No Routine)")}
+                  </Text>
+                </Link>
+              </View>
+            )}
+            onEndReached={fetchMoreStudents}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -117,9 +172,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  text: {
-    fontSize: 30,
-    fontWeight: "bold",
+  searchBox: {
+    width: "90%",
+    height: 40,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8
   },
   item: {
     flex: 1,
@@ -127,9 +187,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-  },
-  itemText: {
-    fontSize: 20,
   },
 });
 
