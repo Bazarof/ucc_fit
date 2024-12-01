@@ -1,11 +1,11 @@
 import { StyleSheet, View } from "react-native";
 
-export default function LevelIcon() {
+export default function IntensityIcon({intensity}:{intensity:number}) {
     return (
         <View style={styles.container}>
-            <View style={styles.lowBar}></View>
-            <View style={styles.mediumBar}></View>
-            <View style={styles.highBar}></View>
+            <View style={[styles.lowBar]}></View>
+            <View style={[styles.mediumBar, {backgroundColor: intensity > 1 ? 'black' : 'none'}]}></View>
+            <View style={[styles.highBar, {backgroundColor: intensity > 2 ? 'black' : 'none'}]}></View>
         </View>
     );
 }
@@ -19,24 +19,22 @@ const styles = StyleSheet.create({
     highBar: {
         width: 10,
         height: '100%',   
-        borderColor: 'gray',
-        backgroundColor: 'gray',
+        borderColor: 'black',
         borderWidth: 2
     },
     mediumBar: {
         width: 10,
         height: '60%',   
         marginEnd: 5,
-        borderColor: 'gray',
-        backgroundColor: 'gray',
+        borderColor: 'black',
         borderWidth: 2
     },
     lowBar: {
         width: 10,
         height: '30%',
         marginEnd: 5,
-        borderColor: 'gray',
-        backgroundColor: 'gray',
+        borderColor: 'black',
+        backgroundColor: 'black',
         borderWidth: 2
     }
 });
