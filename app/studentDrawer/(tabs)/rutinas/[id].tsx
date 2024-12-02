@@ -1,7 +1,8 @@
+import CardView from "@/components/CardView";
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Text } from "react-native";
+import { StyleSheet, ActivityIndicator, Alert, Text, View, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 const routinesCollection = firestore().collection("routines");
@@ -54,21 +55,82 @@ const Routine = () => {
   }, [routineId]);
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
+    <ScrollView contentContainerStyle={{paddingTop: 10}}>
       {loading ? (
         <ActivityIndicator color={'#007FAF'} size="large" />
       ) : (
-        <>
-          <Text style={{ fontSize: 18 }}>{routine.name}</Text>
-          <Text>{routine.description}</Text>
-          <Text>Ejercicios:</Text>
-          {routine.exercises.map((exercise: any) => (
-            <Text key={exercise.id}>- {exercise.name}</Text>
-          ))}
-        </>
+          <>
+
+            <CardView>
+
+              <View style={[styles.container, { marginBottom: 20 }]}>
+                <Text style={[styles.title]}>{routine.name}</Text>
+              </View>
+
+              <View style={[styles.container]}>
+                <Text style={[styles.subtitle]}>Descripción</Text>
+                <Text style={styles.text}>{routine.description}</Text>
+              </View>
+
+            </CardView>
+
+            <View style={[styles.container, styles.exerciseListContainer]}>
+              {routine.exercises.map((exercise: any) => (
+                <>
+                  <View style={styles.exerciseContainer}>
+                      <View style={[styles.container, { alignItems: 'center' }]}>
+                        <Image key={exercise.id} style={{ width: 180, height: 120 }} source={{ uri: exercise.image_url }} />
+                      </View>
+                      <View>
+                        <Text key={exercise.id} style={styles.subtitle}>{exercise.name}</Text>
+                      </View>
+                  </View>
+                </>
+              ))}
+
+            </View>
+          </>
+
       )}
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+  },
+  exerciseListContainer: {
+    paddingTop: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+  },
+  exerciseContainer: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: 'white',
+    width: 175,
+    height: 170,
+    borderRadius: 10,
+    elevation: 3 
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  header2:{
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  text: {
+    fontSize: 16,
+  }
+});
 
 export default Routine;

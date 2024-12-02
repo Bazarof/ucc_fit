@@ -18,7 +18,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Link, router } from "expo-router";
 import CardView from "@/components/CardView";
 import IntensityIcon from "@/components/IntensityIcon";
-import { FAB } from "react-native-paper";
 
 const routinesCollection = firestore().collection("routines");
 // const routinesCollection = collection(firestore(), "routines");
@@ -27,7 +26,7 @@ const routinesCollection = firestore().collection("routines");
 const Routines = () => {
   const navigation = useNavigation();
   const [routines, setRoutines] = useState<
-    { id: string; name?: string; description: string; exercises: object[]; intensity: number; }[]
+    { id: string; name?: string; description: string; exercises: object[]; intensity: number; image_url: string; }[]
   >([]);
   const [loading, setLoading] = useState(false);
   const [lastDoc, setLastDoc] =
@@ -48,6 +47,7 @@ const Routines = () => {
         description: string;
         exercises: object[];
         intensity: number;
+        image_url: string;
       }[]
     );
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
@@ -68,7 +68,8 @@ const Routines = () => {
       ...doc.data(),
       description: doc.data().description,
       exercises: doc.data().exercises,
-      intensity: doc.data().intensity
+      intensity: doc.data().intensity,
+      image_url: doc.data().image_url,
     }));
     setRoutines((prevRoutines) => [...prevRoutines, ...moreRoutines]);
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
@@ -106,7 +107,7 @@ const Routines = () => {
 
                     <View style={{ width: '100%', flexDirection: 'row' }}>
                       <View>
-                        <Image style={{ height: 60, width: 60 }} source={require('../../../../assets/images/icons/calentamiento.png')} />
+                        <Image style={{ height: 60, width: 60 }} source={{uri: item.image_url}} />
                       </View>
                       <View style={{ flex: 1, height: '100%' }}>
                         <View style={{ width: '100%', marginBottom: 5 }}><Text style={styles.cardTitle}>{item.name}</Text></View>
@@ -127,13 +128,6 @@ const Routines = () => {
               onEndReachedThreshold={0.5}
               ListFooterComponent={renderFooter}
             />
-            <FAB
-               style={styles.fab}
-               color="white"
-               icon="plus"
-               onPress={() => {
-                 router.push('/studentDrawer/rutinas/create.tsx');
-               }}/>
           </>
       )}
     </View>
