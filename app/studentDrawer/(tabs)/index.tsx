@@ -8,7 +8,6 @@ import NfcManager, { NfcEvents } from "react-native-nfc-manager";
 import { useSession } from "@/components/session/SessionProvider";
 import CardView from "@/components/CardView";
 import { ScrollView } from "react-native-gesture-handler";
-import TagContainer from "@/components/TagContainer";
 import { createAttendance, fetchLatestAttendance, getCompletedSessionsByUser, getUserConsecutiveWeeks } from "@/services/attendanceService";
 import { getUserCurrentRoutine } from "@/services/routineService";
 import Routine from "@/types/Routine";
