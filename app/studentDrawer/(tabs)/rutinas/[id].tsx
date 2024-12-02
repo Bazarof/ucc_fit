@@ -1,4 +1,4 @@
-import firestore from "@react-native-firebase/firestore";
+import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Text } from "react-native";
@@ -16,7 +16,7 @@ const fetchRoutine = async (id: string) => {
   }
 
   const exercisesData = await Promise.all(
-    routineData.exercises.map(async (exerciseRef: any) => {
+    routineData.exercises.map(async (exerciseRef: FirebaseFirestoreTypes.DocumentReference) => {
       const exerciseDoc = await exerciseRef.get();
       return exerciseDoc.exists
         ? { id: exerciseDoc.id, ...exerciseDoc.data() }
