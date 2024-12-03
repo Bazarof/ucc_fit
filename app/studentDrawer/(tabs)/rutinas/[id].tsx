@@ -1,9 +1,9 @@
 import CardView from "@/components/CardView";
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, ActivityIndicator, Alert, Text, View, Image } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
 const routinesCollection = firestore().collection("routines");
 
@@ -76,14 +76,16 @@ const Routine = () => {
 
             <View style={[styles.container, styles.exerciseListContainer]}>
               {routine.exercises.map((exercise: any) => (
-                <View key={exercise.id} style={styles.exerciseContainer}>
+                <TouchableOpacity key={exercise.id} style={styles.exerciseContainer} onPress={()=>{
+                  router.navigate({pathname: '/studentDrawer/(tabs)/rutinas/description/[id]', params: {id: exercise.id}});
+                }}>
                   <View style={[styles.container, { alignItems: 'center' }]}>
                     <Image style={{ width: 180, height: 120 }} source={{ uri: exercise.image_url }} />
                   </View>
                   <View>
                     <Text style={styles.subtitle}>{exercise.name}</Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
 
             </View>
