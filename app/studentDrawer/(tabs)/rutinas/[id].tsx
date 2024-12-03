@@ -76,16 +76,14 @@ const Routine = () => {
 
             <View style={[styles.container, styles.exerciseListContainer]}>
               {routine.exercises.map((exercise: any) => (
-                <>
-                  <View style={styles.exerciseContainer}>
-                      <View style={[styles.container, { alignItems: 'center' }]}>
-                        <Image key={exercise.id} style={{ width: 180, height: 120 }} source={{ uri: exercise.image_url }} />
-                      </View>
-                      <View>
-                        <Text key={exercise.id} style={styles.subtitle}>{exercise.name}</Text>
-                      </View>
+                <View key={exercise.id} style={styles.exerciseContainer}>
+                  <View style={[styles.container, { alignItems: 'center' }]}>
+                    <Image style={{ width: 180, height: 120 }} source={{ uri: exercise.image_url }} />
                   </View>
-                </>
+                  <View>
+                    <Text style={styles.subtitle}>{exercise.name}</Text>
+                  </View>
+                </View>
               ))}
 
             </View>

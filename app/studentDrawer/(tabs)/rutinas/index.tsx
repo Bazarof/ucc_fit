@@ -106,7 +106,7 @@ const Routines = () => {
                   }}>
 
                     <View style={{ width: '100%', flexDirection: 'row' }}>
-                      <View>
+                      <View style={{marginRight: 20}}>
                         <Image style={{ height: 60, width: 60 }} source={{uri: item.image_url}} />
                       </View>
                       <View style={{ flex: 1, height: '100%' }}>
