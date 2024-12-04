@@ -1,7 +1,7 @@
 import Meal from "./Meal";
 
 export default interface MealPlan {
-    id: number;
+    uid: string;
     name: string;
     description: string;
     meals: Meal[];

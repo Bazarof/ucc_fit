@@ -13,11 +13,11 @@ export default function RootLayout() {
 
   const [hasNfc, setHasNfc] = useState<boolean | null>(null);
 
-  useEffect(()=>{
-    
-    async function checkNfc(){
+  useEffect(() => {
+
+    async function checkNfc() {
       const supported = await NfcManager.isSupported();
-      if(supported){
+      if (supported) {
         await NfcManager.start();
       }
       setHasNfc(supported);
@@ -25,12 +25,12 @@ export default function RootLayout() {
 
     checkNfc();
 
-  },[]);
+  }, []);
 
-  if(hasNfc === null){
+  if (hasNfc === null) {
     return null;
   }//else if(!hasNfc){
-    // Set other type of check attendance
+  // Set other type of check attendance
   //}
 
   return (
@@ -46,6 +46,10 @@ export default function RootLayout() {
             <Stack.Screen name="adminDrawer" options={{ headerShown: false }} />
             <Stack.Screen
               name="trainerDrawer"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="nutritionistDrawer"
               options={{ headerShown: false }}
             />
           </Stack>
