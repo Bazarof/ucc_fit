@@ -4,4 +4,5 @@ export default interface Exercise {
   muscleGroup: "chest" | "back" | "shoulders" | "legs" | "arms";
   image_url: string;
   description: string;
+  reps: number;
 }

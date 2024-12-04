@@ -68,7 +68,7 @@ const Routine = () => {
               </View>
 
               <View style={[styles.container]}>
-                <Text style={[styles.subtitle]}>Descripción</Text>
+                <Text style={[{fontSize: 26, fontWeight: 'bold'}]}>Descripción</Text>
                 <Text style={styles.text}>{routine.description}</Text>
               </View>
 
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     width: 175,
     height: 170,
     borderRadius: 10,
-    elevation: 3 
+    elevation: 2 
   },
   title: {
     fontSize: 40,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
   }
 });
 
