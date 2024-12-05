@@ -1,7 +1,5 @@
-import { View, Text } from "react-native";
+import PlaceHolder from "@/components/PlaceHolder";
 
 export default function PlanAlimenticio(){
-    return <View>
-        <Text>Pagina de plan alimenticio</Text>
-    </View>
+    return <PlaceHolder/>;
 }
