@@ -20,15 +20,7 @@ export default function login() {
     // TODO: Handle session expiry
     console.log("ON AUTH STATE CHANGED", user);
 
-    // const a = user?.campus;
-
-    getUser(user?.uid as string).then((user: User) => {
-      console.log("USER", user);
-      // return user;
-      console.log("[Firestore@index]", user);
-
-      setSessionData(user);
-    });
+    getUser(user?.uid as string).then(setSessionData);
 
     if (initializing) setInitializing(false);
   }
@@ -54,15 +46,13 @@ export default function login() {
           case "trainer":
             router.replace("/trainerDrawer");
             break;
-          // case "nutritionist":
-          //   router.replace("/nutritionistDrawer");
-          //   break;
-          // default:
-          //   router.replace("/login");
+          case "nutritionist":
+            router.replace("/nutritionistDrawer");
+            break;
+          default:
+            router.replace("/");
         }
       }
-
-      // if (session && session.role === "student")router.replace("/studentDrawer");
     }
   }, [initializing, session, sessionRole, router]);
 
