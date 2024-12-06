@@ -1,16 +1,18 @@
 import React from "react";
-import Form, { FormField } from "@/components/Form";
+import Form, { Field } from "@/components/Form";
+import { createMeal } from "@/services/mealService";
 
-const CreateProfileScreen = () => {
-    const fields: FormField[] = [
-        { name: "name", label: "Name", type: "text", validation: { required: true, minLength: 3 } },
-        { name: "description", label: "Description", type: "textarea" },
-        { name: "profilePicture", label: "Profile Picture", type: "file", validation: { required: true } },
+const CreateMealScreen = () => {
+    const fields: Field[] = [
+        { name: "name", label: "Nombre", type: "text", validation: { required: true, minLength: 3 } },
+        { name: "description", label: "Descripción", type: "textarea" },
+        // { name: "image_url", label: "Imagen", type: "file", validation: { required: true } },
     ];
 
     const handleSubmit = async (formData: any) => {
-        // Save other form data to Firestore
         console.log("Submitted Data:", formData);
+
+        await createMeal(formData);
     };
 
     return (
@@ -18,10 +20,9 @@ const CreateProfileScreen = () => {
             title="Create Profile"
             fields={fields}
             collectionName="profiles"
-            documentId="newDocId123"
             onSubmit={handleSubmit}
         />
     );
 };
 
-export default CreateProfileScreen;
+export default CreateMealScreen;

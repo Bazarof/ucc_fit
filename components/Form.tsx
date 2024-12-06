@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadFileToFirebase, saveFileUrlToFirestore } from "@/services/fileService";
+import { useRouter } from "expo-router";
 
-interface Field {
+export interface Field {
     name: string;
     label: string;
     type: string;
@@ -18,9 +19,10 @@ interface FormProps {
     onSubmit: (formData: any, docId: string | null) => void;
 }
 
-export const ReusableForm: React.FC<FormProps> = ({ title, fields, collectionName, docId = null, onSubmit }) => {
+const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null, onSubmit }) => {
     const [formData, setFormData] = useState<any>({});
     const [errors, setErrors] = useState<any>({});
+    const router = useRouter()
 
     const handleInputChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -29,8 +31,10 @@ export const ReusableForm: React.FC<FormProps> = ({ title, fields, collectionNam
     const handleFileUpload = async (name: string) => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
+            // allowsEditing: true,
             quality: 1,
+            selectionLimit: 1,
+
         });
 
         if (!result.canceled) {
@@ -68,6 +72,7 @@ export const ReusableForm: React.FC<FormProps> = ({ title, fields, collectionNam
             try {
                 await onSubmit(formData, docId);
                 Alert.alert("Success", "Form submitted successfully!");
+                router.back();
             } catch (error) {
                 Alert.alert("Error", "Failed to submit form.");
             }
@@ -144,3 +149,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
 });
+
+
+export default Form;
