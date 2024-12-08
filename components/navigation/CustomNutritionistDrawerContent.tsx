@@ -64,7 +64,7 @@ export default function CustomDrawerContent(props: any) {
                   width: 30,
                   height: 30,
                 }}
-                source={require("../../assets/images/icons/dumbell.png")}
+                source={require("../../assets/images/icons/user.png")}
               />
             )}
             label={"Usuarios"}
