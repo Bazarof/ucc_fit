@@ -1,9 +1,26 @@
-import React, { useState } from "react";
+import { collection, getFirestore } from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, FlatList } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 
-const MealSelect = ({ mealOptions, onUpdate }: any) => {
+const MealSelect = ({ onUpdate }: any) => {
     const [mealArray, setMealArray] = useState<any[]>([]);
+    const [mealOptions, setMealOptions] = useState<any[]>([]);
+
+    useEffect(() => {
+        collection(getFirestore(), "meals")
+            .get()
+            .then((querySnapshot) => {
+                const options = querySnapshot.docs.map((doc) => doc.data());
+
+                const mappedOptions = options.map((option: any) => ({
+                    key: option.uid,
+                    value: option.name,
+                }));
+
+                setMealOptions(mappedOptions);
+            });
+    }, []);
 
     const handleAddMeal = () => {
         setMealArray([
@@ -82,7 +99,7 @@ const MealSelect = ({ mealOptions, onUpdate }: any) => {
                 )}
             />
             <TouchableOpacity onPress={handleAddMeal} style={styles.addButton}>
-                <Text style={styles.addButtonText}>+ Add Meal</Text>
+                <Text style={styles.addButtonText}>+ Añadir comida</Text>
             </TouchableOpacity>
         </View>
     );

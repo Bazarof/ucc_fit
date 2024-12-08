@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -39,8 +39,28 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
     const [loading, setLoading] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const router = useRouter();
+    const [fieldSources, setFieldSources] = useState<any[]>([]);
 
-    const [mealOptions, setMealOptions] = useState<any[]>([]);
+    useEffect(() => {
+
+        const modelNames = fields.filter((field) => field.model && field.model != undefined).map((field) => field.model);
+
+        if (!modelNames.length) return;
+
+        for (const modelName of modelNames) {
+            const db = getFirestore();
+            const modelCollection = collection(db, modelName as string);
+
+            getDocs(modelCollection).then((querySnapshot) => {
+                const options = querySnapshot.docs.map((doc) => ({
+
+                    ...doc.data(), uid: doc.id
+                }));
+
+                setFieldSources((prevSources) => [...prevSources, { name: modelName, data: options }]);
+            })
+        }
+    }, []);
 
     const handleInputChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -138,17 +158,18 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
 
 
                 if (field.model) {
-                    const db = getFirestore();
-                    const modelCollection = collection(db, field.model);
+                    let optionKey = 'uid'
+                    let optionValue = 'name'
 
-                    getDocs(modelCollection).then((querySnapshot) => {
-                        const options = querySnapshot.docs.map((doc) => doc.data());
+                    if (field.model === 'users') {
+                        optionKey = 'uid'
+                        optionValue = 'displayName'
+                    }
 
-                        mappedOptions = options.map((option: FirebaseFirestoreTypes.DocumentData) => ({
-                            key: option.id,
-                            value: option.name,
-                        }));
-                    })
+                    mappedOptions = fieldSources.find((source) => source.name === field.model)?.data.map((option: any) => ({
+                        key: option[optionKey],
+                        value: option[optionValue],
+                    })) || [];
                 }
 
                 return (
@@ -166,7 +187,6 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
 
             case 'meal_select':
                 return <MealSelect
-                    mealOptions={mealOptions}
                     onUpdate={(value: any) => handleInputChange("meal_select", value)}
                 />
 
@@ -192,7 +212,7 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
                 </View>
             ))}
             <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                <Text style={styles.buttonText}>Submit</Text>
+                <Text style={styles.buttonText}>Enviar</Text>
             </TouchableOpacity>
         </View>
     );
