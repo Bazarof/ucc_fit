@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "1008981922683",
     "project_id": "ucc-fit",
-    "storage_bucket": "ucc-fit.appspot.com"
+    "storage_bucket": "ucc-fit.firebasestorage.app"
   },
   "client": [
     {
