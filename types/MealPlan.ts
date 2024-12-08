@@ -5,6 +5,7 @@ export default interface MealPlan {
     name: string;
     description: string;
     meals: Meal[];
+    objective: string;
     createdAt: Date;
     updatedAt: Date;
 }

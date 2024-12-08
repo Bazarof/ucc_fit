@@ -1,12 +1,24 @@
 import ResourceList from "@/components/ResourceList";
-import { getCompletedSessions } from "@/services/attendanceService";
-import { getStudentsWithoutRoutine } from "@/services/routineService";
 import MealPlan from "@/types/MealPlan";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { Icon } from "react-native-paper";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
+
+['Perder peso', 'Ganar peso', 'Ganar masa muscular', 'Mantener peso', 'Mejorar salud']
+const getMealPlanImage = (mealPlan: MealPlan) => {
+  switch (mealPlan.objective) {
+    case 'Perder peso':
+      return require('@/assets/images/lose_weight.png');
+    case 'Ganar peso':
+      return require('@/assets/images/gain_weight.png');
+    case 'Ganar masa muscular':
+      return require('@/assets/images/muscle.png');
+    case 'Mantener peso':
+      return require('@/assets/images/keep_weight.jpg');
+    default:
+      return require('@/assets/images/health_fitness.jpg');;
+  }
+}
 
 const MealPlanItem = (item: MealPlan) => {
   const router = useRouter();
@@ -29,47 +41,7 @@ const MealPlanItem = (item: MealPlan) => {
           flexDirection: "row",
         }}
       >
-        <View style={{ height: 80, width: 80, backgroundColor: "red" }}></View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-end",
-            marginHorizontal: 10,
-            flex: 0.2,
-          }}
-        >
-          <View
-            style={{
-              width: 10,
-              height: 10,
-              backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-          <View
-            style={{
-              width: 10,
-              height: 20,
-              // backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-          <View
-            style={{
-              width: 10,
-              height: 30,
-              // backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-        </View>
+        <Image source={getMealPlanImage(item)} style={{ height: 80, width: 80 }} />
 
         <View
           style={{
@@ -82,7 +54,7 @@ const MealPlanItem = (item: MealPlan) => {
             {item.name}
           </Text>
           <View>
-            <Text>01:30 hr</Text>
+            <Text>{item.description}</Text>
           </View>
         </View>
       </View>
