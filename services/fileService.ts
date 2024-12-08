@@ -1,6 +1,11 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import storage, { getStorage, ref, uploadBytes, getDownloadURL } from "@react-native-firebase/storage";
 import { addDoc, collection, doc, getFirestore, setDoc, updateDoc } from "@react-native-firebase/firestore";
+import { getApp } from "@react-native-firebase/app";
 // import { db } from "@/firebase"; // Update with your Firebase configuration path
+
+
+// console.log(getStorage())
+// console.log(getApp().storage)
 
 /**
  * Uploads a file to Firebase Storage and returns the download URL.
@@ -10,20 +15,18 @@ import { addDoc, collection, doc, getFirestore, setDoc, updateDoc } from "@react
  */
 export const uploadFileToFirebase = async (fileUri: string, folderName: string = "uploads") => {
     try {
-        // Fetch the file blob from the file URI
-        const response = await fetch(fileUri);
-        const blob = await response.blob();
-
-        // Set up Firebase Storage
-        const storage = getStorage();
-        const fileName = `${folderName}/${Date.now()}`; // Unique file name with timestamp
-        const storageRef = ref(storage, fileName);
+        // Generate a unique file name with a timestamp
+        const fileName = `${folderName}/${Date.now()}`;
 
         // Upload the file to Firebase Storage
-        const snapshot = await uploadBytes(storageRef, blob);
+        const reference = storage().ref(fileName);
+        const task = reference.putFile(fileUri);
+
+        // Wait for the upload to complete
+        await task;
 
         // Get the download URL
-        const downloadUrl = await getDownloadURL(snapshot.ref);
+        const downloadUrl = await reference.getDownloadURL();
 
         console.log("File uploaded successfully:", downloadUrl);
         return downloadUrl;

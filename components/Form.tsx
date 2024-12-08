@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    ActivityIndicator,
+    Image,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadFileToFirebase, saveFileUrlToFirestore } from "@/services/fileService";
 import { useRouter } from "expo-router";
@@ -15,14 +24,16 @@ interface FormProps {
     title: string;
     fields: Field[];
     collectionName: string;
-    docId?: string;  // Now optional for the case when creating a new document
+    docId?: string; // Optional for creating a new document
     onSubmit: (formData: any, docId: string | null) => void;
 }
 
 const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null, onSubmit }) => {
     const [formData, setFormData] = useState<any>({});
     const [errors, setErrors] = useState<any>({});
-    const router = useRouter()
+    const [loading, setLoading] = useState<boolean>(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleInputChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -31,17 +42,25 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
     const handleFileUpload = async (name: string) => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            // allowsEditing: true,
             quality: 1,
             selectionLimit: 1,
-
         });
 
         if (!result.canceled) {
+            setLoading(true); // Start loader
             const fileUri = result.assets[0].uri;
-            const downloadUrl = await uploadFileToFirebase(fileUri, "uploads");
-            setFormData({ ...formData, [name]: downloadUrl });
-            await saveFileUrlToFirestore(collectionName, docId, name, downloadUrl); // Save URL whether updating or creating
+
+            try {
+                const downloadUrl = await uploadFileToFirebase(fileUri, "uploads");
+                setFormData({ ...formData, [name]: downloadUrl });
+                setImagePreview(downloadUrl); // Set preview
+                await saveFileUrlToFirestore(collectionName, docId, name, downloadUrl);
+                Alert.alert("Success", "File uploaded successfully!");
+            } catch (error) {
+                Alert.alert("Error", "Failed to upload file.");
+            } finally {
+                setLoading(false); // Stop loader
+            }
         }
     };
 
@@ -88,9 +107,16 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
                 <View key={field.name} style={styles.inputContainer}>
                     <Text>{field.label}</Text>
                     {field.type === "file" ? (
-                        <TouchableOpacity onPress={() => handleFileUpload(field.name)} style={styles.fileInput}>
-                            <Text>Upload File</Text>
-                        </TouchableOpacity>
+                        <>
+                            <TouchableOpacity
+                                onPress={() => handleFileUpload(field.name)}
+                                style={styles.fileInput}
+                            >
+                                <Text>{loading ? "Cargando..." : "Cargar"}</Text>
+                            </TouchableOpacity>
+                            {loading && <ActivityIndicator size="small" color="#007FAF" />}
+                            {imagePreview && <Image source={{ uri: imagePreview }} style={styles.imagePreview} />}
+                        </>
                     ) : (
                         <TextInput
                             style={styles.textInput}
@@ -133,6 +159,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f0f0f0",
         borderRadius: 5,
         textAlign: "center",
+        marginTop: 5,
     },
     button: {
         backgroundColor: "#007FAF",
@@ -148,7 +175,12 @@ const styles = StyleSheet.create({
         color: "red",
         marginTop: 5,
     },
+    imagePreview: {
+        width: 100,
+        height: 100,
+        marginTop: 10,
+        borderRadius: 5,
+    },
 });
-
 
 export default Form;
