@@ -12,12 +12,17 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { uploadFileToFirebase, saveFileUrlToFirestore } from "@/services/fileService";
 import { useRouter } from "expo-router";
+import { SelectList } from "react-native-dropdown-select-list";
+import { FirebaseFirestoreTypes, collection, getDocs, getFirestore } from "@react-native-firebase/firestore";
+import MealSelect from "./MealSelect";
 
 export interface Field {
     name: string;
     label: string;
     type: string;
     validation?: { required?: boolean; minLength?: number; maxLength?: number };
+    options?: string[];
+    model?: string;
 }
 
 interface FormProps {
@@ -34,6 +39,8 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
     const [loading, setLoading] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const router = useRouter();
+
+    const [mealOptions, setMealOptions] = useState<any[]>([]);
 
     const handleInputChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -100,32 +107,87 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
         }
     };
 
+    const renderField = (field: Field) => {
+        switch (field.type) {
+            case 'file':
+
+                return <>
+                    <TouchableOpacity
+                        onPress={() => handleFileUpload(field.name)}
+                        style={styles.fileInput}
+                    >
+                        <Text>{loading ? "Cargando..." : "Cargar"}</Text>
+                    </TouchableOpacity>
+                    {loading && <ActivityIndicator size="small" color="#007FAF" />}
+                    {imagePreview && <Image source={{ uri: imagePreview }} style={styles.imagePreview} />}
+                </>
+
+            case 'select':
+
+                const handleSelectChange = (fieldName: string, selectedValue: string) => {
+                    setFormData((prevData: any) => ({ ...prevData, [fieldName]: selectedValue }));
+                };
+
+                let mappedOptions =
+                    field.options && !field.model
+                        ? field.options.map((option) => ({
+                            key: option,
+                            value: option,
+                        }))
+                        : [];
+
+
+                if (field.model) {
+                    const db = getFirestore();
+                    const modelCollection = collection(db, field.model);
+
+                    getDocs(modelCollection).then((querySnapshot) => {
+                        const options = querySnapshot.docs.map((doc) => doc.data());
+
+                        mappedOptions = options.map((option: FirebaseFirestoreTypes.DocumentData) => ({
+                            key: option.id,
+                            value: option.name,
+                        }));
+                    })
+                }
+
+                return (
+                    <SelectList
+                        data={mappedOptions}
+                        setSelected={(value: string) => handleSelectChange(field.name, value)}
+                        save="key"
+                        searchPlaceholder={`Search ${field.label}`}
+                        placeholder={field.label}
+                        boxStyles={{ marginTop: 10 }}
+                        inputStyles={{ color: "gray" }}
+                    />
+                );
+
+
+            case 'meal_select':
+                return <MealSelect
+                    mealOptions={mealOptions}
+                    onUpdate={(value: any) => handleInputChange("meal_select", value)}
+                />
+
+            default:
+                return <TextInput
+                    style={styles.textInput}
+                    onChangeText={(value) => handleInputChange(field.name, value)}
+                    value={formData[field.name] || ""}
+                    placeholder={field.label}
+                    secureTextEntry={field.type === "password"}
+                />
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{title}</Text>
             {fields.map((field) => (
                 <View key={field.name} style={styles.inputContainer}>
                     <Text>{field.label}</Text>
-                    {field.type === "file" ? (
-                        <>
-                            <TouchableOpacity
-                                onPress={() => handleFileUpload(field.name)}
-                                style={styles.fileInput}
-                            >
-                                <Text>{loading ? "Cargando..." : "Cargar"}</Text>
-                            </TouchableOpacity>
-                            {loading && <ActivityIndicator size="small" color="#007FAF" />}
-                            {imagePreview && <Image source={{ uri: imagePreview }} style={styles.imagePreview} />}
-                        </>
-                    ) : (
-                        <TextInput
-                            style={styles.textInput}
-                            onChangeText={(value) => handleInputChange(field.name, value)}
-                            value={formData[field.name] || ""}
-                            placeholder={field.label}
-                            secureTextEntry={field.type === "password"}
-                        />
-                    )}
+                    {renderField(field)}
                     {errors[field.name] && <Text style={styles.errorText}>{errors[field.name]}</Text>}
                 </View>
             ))}

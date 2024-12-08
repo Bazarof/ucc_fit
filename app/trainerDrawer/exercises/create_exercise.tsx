@@ -74,14 +74,14 @@ export default function CreateExercise() {
             const exercise: Exercise = {
               uid: "",
               name,
-              muscleGroup: muscleGroup as
-                | "chest"
-                | "back"
-                | "shoulders"
-                | "legs"
-                | "arms",
+              muscleGroup: muscleGroup as "chest" |
+                "back" |
+                "shoulders" |
+                "legs" |
+                "arms",
               image_url: "",
               description,
+              reps: 12
             };
             await createExercise(exercise);
             Alert.alert("Éxito", "Ejercicio creado correctamente.");
