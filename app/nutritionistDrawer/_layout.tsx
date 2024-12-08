@@ -32,7 +32,7 @@ export default function Layout() {
         <Drawer.Screen
           name="mealplans"
           options={{
-            title: "Planes alimenticios",
+            title: "Planes",
           }}
         />
 
