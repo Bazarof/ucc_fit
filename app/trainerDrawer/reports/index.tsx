@@ -8,6 +8,7 @@ import {
     StyleSheet,
     Pressable,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import firestore from "@react-native-firebase/firestore";
@@ -20,6 +21,7 @@ export default function TrainerReports() {
     const [reports, setReports] = useState<string[]>([]);
     const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null); // Track selected PDF URL
     const [modalVisible, setModalVisible] = useState(false); // Track modal visibility
+    const [loading, setLoading] = useState(false);
 
     const openPicker = () => {
         DateTimePickerAndroid.open({
@@ -51,6 +53,8 @@ export default function TrainerReports() {
     // Function to generate the report and convert it to PDF
     // Function to generate the report and convert it to PDF
     const generateReport = async () => {
+        setLoading(true); // Set loading state to true
+
         try {
             const startOfDay = new Date(date.setHours(0, 0, 0, 0)); // Start of the selected date
             const endOfDay = new Date(date.setHours(23, 59, 59, 999)); // End of the selected date
@@ -180,6 +184,12 @@ export default function TrainerReports() {
             const reportRef = storage().ref(`reports/Asistencia_${date.toLocaleDateString('es-MX').replaceAll('/', '_')}.pdf`);
             await reportRef.putFile(uri);
 
+            // Re-fetch reports from Firebase Storage after upload
+            const reportsRef = storage().ref("reports/");
+            const result = await reportsRef.listAll();
+            const fileNames = result.items.map((item) => item.name);
+            setReports(fileNames); // Update reports list
+
             // Get the URL of the uploaded PDF
             const pdfUrl = await reportRef.getDownloadURL();
             setSelectedPdfUrl(pdfUrl); // Set the URL for the PDF viewer
@@ -187,9 +197,16 @@ export default function TrainerReports() {
         } catch (error) {
             console.error("Error generating report:", error);
             Alert.alert("Error", "Failed to generate the report.");
+        } finally {
+            setLoading(false); // Set loading state to false
         }
     };
 
+    // if (loading) {
+    //     return (
+
+    //     );
+    // }
 
 
     return (
@@ -220,8 +237,7 @@ export default function TrainerReports() {
                     style={{
                         backgroundColor: "#007FAF",
                         padding: 10,
-                        borderRadius: 10,
-                        flex: 1,
+                        borderRadius: 10
                     }}
                 >
                     <Text style={{ color: "white" }}>Generar reporte</Text>
@@ -264,6 +280,22 @@ export default function TrainerReports() {
                 )}
                 ListEmptyComponent={<Text>No hay reportes disponibles</Text>}
             />
+
+            {loading && <View style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)", // Optional background color for loader
+            }}>
+                <View style={{ backgroundColor: "white", padding: 20, borderRadius: 10 }}>
+                    <ActivityIndicator size="large" color="#007FAF" />
+                    <Text>Generando reporte...</Text>
+                </View>
+            </View>}
 
             {/* PDF Modal */}
             <Modal
