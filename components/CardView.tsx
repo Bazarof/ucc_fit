@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     card: {
-        borderRadius: 15,
+        borderRadius: 20,
         backgroundColor: 'white',
         padding: 20,
         width: '100%',

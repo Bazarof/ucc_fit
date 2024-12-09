@@ -1,5 +1,5 @@
 import { Text, View, Image, StyleSheet, Platform, AppState } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ProfilerOnRenderCallback, useEffect, useRef, useState } from "react";
 import { FAB, ProgressBar } from "react-native-paper";
 import AndroidPromptNfc, {
   AndroidPromptNfcRef,
@@ -11,6 +11,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import { createAttendance, fetchLatestAttendance, getCompletedSessionsByUser, getUserConsecutiveWeeks } from "@/services/attendanceService";
 import { getUserCurrentRoutine } from "@/services/routineService";
 import Routine from "@/types/Routine";
+import { getAllPromotions } from "@/services/promotionService";
+import Promotion from "@/types/Promotion";
+import ImageCardView from "@/components/ImageCardView";
 
 // Dark mode color #25292e
 
@@ -27,6 +30,7 @@ export default function home() {
   const [sesiones, setSesiones] = useState(0);
   const [totalSesiones, setTotalSesiones] = useState(0);
   const [consecutiveWeeks, setConsecutiveWeeks] = useState(0);
+  const [promotions, setPromotions] = useState<Promotion[] | undefined>();
 
   const [currentRoutine, setCurrentRoutine] = useState<Routine | null>(null);
   const [sessionsThisMonth, setSessionsThisMonth] = useState(0);
@@ -73,6 +77,13 @@ export default function home() {
         setConsecutiveWeeks(weeks);
       });
 
+      getAllPromotions()
+      .then((promotions)=>{
+        setPromotions(promotions);
+        
+      })
+      .catch((error)=>{console.log("PROMOTIONS ERROR: ", error);});
+
     } catch (error) {
       console.error("Error fetching user's current routine:", error);
     }
@@ -118,7 +129,7 @@ export default function home() {
   }, []);
 
   return (
-    <View style={[styles.container]}>
+    <View style={[styles.container,]}>
       <ScrollView style={[styles.scrollview,]}>
 
         {/* Mi entrenamiento */}
@@ -220,6 +231,25 @@ export default function home() {
 
         </CardView>
 
+        {/* Advertisement */}
+          
+        { promotions &&
+          promotions.map((promo: Promotion) => (
+            <ImageCardView>
+              <Image style={{height: 200, width: '100%', borderRadius: 20, position: 'absolute', top: 0}}  source={{uri: promo.image_url}} resizeMode={'cover'}/>
+              <View style={[styles.overlay, StyleSheet.absoluteFill]}>
+                <View style={{flex: 1}}>
+                  <Text style={[styles.overlayText, {fontSize: 36}]}>{promo.title}</Text>
+                </View>
+                <View style={{flex: 1}}>
+                  <Text style={[styles.overlayText, {fontSize: 20}]}>{promo.subtitle}</Text>
+                </View>
+              </View>
+            </ImageCardView>
+            ))
+        }
+       
+
       </ScrollView>
       <FAB
         style={styles.fab}
@@ -238,6 +268,16 @@ export default function home() {
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+  },
+  overlayText: {
+    color: '#fff',    // Texto blanco
+    fontWeight: 'bold',  // Poner el texto en negrita
+    zIndex: 1,
+  },
   container: {
     flex: 1,
   },
@@ -252,7 +292,6 @@ const styles = StyleSheet.create({
   scrollview: {
     flex: 1,
     paddingTop: 10,
-    paddingBottom: 10
   },
   text: {
     fontSize: 30,
