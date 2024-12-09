@@ -70,6 +70,45 @@ export const UserDetail = () => {
         })
     }, [userId]);
 
+    function renderRoutineSelect() {
+        return <><Text style={{ marginTop: 10 }}>Asignar rutina</Text>
+
+            <SelectList
+                data={allRoutines.map((routine) => ({
+                    key: routine.uid,
+                    value: routine.name,
+                }))}
+                save="key"
+                setSelected={setSelectedRoutineUID}
+                searchPlaceholder="Buscar rutina"
+                placeholder="Rutina"
+                boxStyles={{ marginTop: 10 }}
+                inputStyles={{ color: "gray" }}
+            />
+
+            <TouchableOpacity
+                style={{
+                    backgroundColor: "#007FAF",
+                    padding: 10,
+                    borderRadius: 5,
+                    marginTop: 10,
+                }}
+                onPress={async () => {
+                    try {
+                        await assignRoutineToUser(userId, selectedRoutineUID ?? "");
+                        Alert.alert("Éxito", "Rutina asignada correctamente.");
+                        router.back();
+                    } catch (error) {
+                        console.error(error);
+                        Alert.alert("Error", "No se pudo asignar la rutina.");
+                    }
+                }}
+            >
+                <Text style={{ color: "white" }}>Asignar rutina</Text>
+            </TouchableOpacity></>
+    }
+
+
     return (
         <ScrollView contentContainerStyle={{ padding: 20 }}>
             {loading ? (
@@ -83,41 +122,7 @@ export const UserDetail = () => {
                     <UserRow label="Ultima rutina " value={latestRoutine?.name ?? "---"} />
                     <UserRow label="Ultimo plan alimenticio" value={latestMealPlan?.name ?? "---"} />
 
-                    <Text style={{ marginTop: 10 }}>Asignar rutina</Text>
-
-                    <SelectList
-                        data={allRoutines.map((routine) => ({
-                            key: routine.uid,
-                            value: routine.name,
-                        }))}
-                        save="key"
-                        setSelected={setSelectedRoutineUID}
-                        searchPlaceholder="Buscar rutina"
-                        placeholder="Rutina"
-                        boxStyles={{ marginTop: 10 }}
-                        inputStyles={{ color: "gray" }}
-                    />
-
-                    <TouchableOpacity
-                        style={{
-                            backgroundColor: "#007FAF",
-                            padding: 10,
-                            borderRadius: 5,
-                            marginTop: 10,
-                        }}
-                        onPress={async () => {
-                            try {
-                                await assignRoutineToUser(userId, selectedRoutineUID ?? "");
-                                Alert.alert("Éxito", "Rutina asignada correctamente.");
-                                router.back();
-                            } catch (error) {
-                                console.error(error);
-                                Alert.alert("Error", "No se pudo asignar la rutina.");
-                            }
-                        }}
-                    >
-                        <Text style={{ color: "white" }}>Asignar rutina</Text>
-                    </TouchableOpacity>
+                    {session?.role === "trainer" && renderRoutineSelect()}
                 </>
             )}
         </ScrollView>

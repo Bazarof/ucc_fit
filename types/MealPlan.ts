@@ -6,6 +6,6 @@ export default interface MealPlan {
     description: string;
     meals: Meal[];
     objective: string;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
 }

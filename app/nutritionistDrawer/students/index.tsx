@@ -154,7 +154,7 @@ const UsersWithMealPlans = () => {
 
                   <View style={{ flex: 1, width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <Text>{item.displayName}</Text>
-                    {mealPlansMap[item.uid] !== undefined && ( // Checking if user has a meal plan
+                    {(mealPlansMap[item.uid] !== undefined && mealPlansMap[item.uid] === false) && ( // Checking if user has a meal plan
                       <Icon source="exclamation" color="red" size={20} />
                     )}
                   </View>
