@@ -63,6 +63,7 @@ export default function TrainerReports() {
                 .get();
 
             const attendanceData = snapshot.docs.map((doc) => doc.data());
+            console.log(attendanceData);
 
             // Create a map to store entries by user ID
             const usersMap = new Map();
@@ -70,7 +71,7 @@ export default function TrainerReports() {
             // Iterate over the attendance data to organize entries and exits
             attendanceData.forEach((entry) => {
                 const userId = entry.user.split("/")[1]; // Extract the user ID from the user reference
-                const userTime = entry.created_at.toDate().toLocaleTimeString("es-MX");
+                const userTime = entry.created_at.toDate().toISOString();
 
                 // If the user doesn't exist in the map, create a new entry
                 if (!usersMap.has(userId)) {
@@ -78,6 +79,7 @@ export default function TrainerReports() {
                 }
 
                 const user = usersMap.get(userId);
+                console.log("usertime", userTime);
 
                 if (entry.type === "in" && !user.entryTime) {
                     // If it's an "in" type and entryTime is not set, set the entry time
@@ -104,50 +106,71 @@ export default function TrainerReports() {
                 );
             });
 
-            console.log(usersMap)
+            console.log(usersMap);
 
             await Promise.all(userPromises);
 
+            // Helper function to convert Firestore timestamp to local time
+            const convertToLocalTime = (timestamp: string) => {
+                const date = new Date(timestamp); // Parse the Firestore ISO timestamp
+                const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000); // Adjust to local time
+                return localDate;
+            };
+
+            // Helper function to calculate the duration between entry and exit times
+            const calculateStayDuration = (entryTimestamp: string, exitTimestamp: string): number => {
+                const entryDate = convertToLocalTime(entryTimestamp); // Convert to local time
+                const exitDate = convertToLocalTime(exitTimestamp); // Convert to local time
+
+                const durationMs = exitDate.getTime() - entryDate.getTime();
+                if (durationMs < 0) {
+                    return 0; // If exit is earlier than entry, return 0
+                }
+                return durationMs / 3600000; // Convert milliseconds to hours
+            };
+
             // Build the HTML content for the table
             const tableRows: string[] = [];
-            usersMap.forEach((user, userId, map) => {
+            let rowNumber = 1;
+
+            usersMap.forEach((user, userId) => {
                 const name = userNames.get(userId);
                 const stayDuration = user.entryTime && user.exitTime
                     ? calculateStayDuration(user.entryTime, user.exitTime)
                     : 0;
 
                 tableRows.push(`
-                <tr>
-                    <td>${tableRows.length + 1}</td>
-                    <td>${name}</td>
-                    <td>${user.entryTime || "N/A"}</td>
-                    <td>${user.exitTime || "N/A"}</td>
-                    <td>${stayDuration.toFixed(2)} hrs</td>
-                </tr>
-            `);
+                    <tr>
+                        <td>${rowNumber++}</td>
+                        <td>${name}</td>
+                        <td>${user.entryTime ? new Date(user.entryTime).toLocaleTimeString() : "N/A"}</td>
+                        <td>${user.exitTime ? new Date(user.exitTime).toLocaleTimeString() : "N/A"}</td>
+                        <td>${stayDuration.toFixed(2)} hrs</td>
+                    </tr>
+                `);
             });
 
             const htmlContent = `
-            <html>
-                <body>
-                    <h2>Reporte de Asistencia - ${date.toLocaleDateString("es-MX")}</h2>
-                    <table border="1" cellspacing="0" cellpadding="5" style="width:100%; text-align: center;">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Nombre</th>
-                                <th>Entrada</th>
-                                <th>Salida</th>
-                                <th>Estancia</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows.join("")}
-                        </tbody>
-                    </table>
-                </body>
-            </html>
-        `;
+                <html>
+                    <body>
+                        <h2>Reporte de Asistencia - ${date.toLocaleDateString("es-MX")}</h2>
+                        <table border="1" cellspacing="0" cellpadding="5" style="width:100%; text-align: center;">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Nombre</th>
+                                    <th>Entrada</th>
+                                    <th>Salida</th>
+                                    <th>Estancia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows.join("")}
+                            </tbody>
+                        </table>
+                    </body>
+                </html>
+            `;
 
             // Generate PDF from HTML
             const { uri } = await Print.printToFileAsync({ html: htmlContent });
@@ -166,13 +189,6 @@ export default function TrainerReports() {
         }
     };
 
-    // Helper function to calculate the duration between entry and exit times
-    const calculateStayDuration = (entryTime: string, exitTime: string): number => {
-        const entryDate = new Date(`1970-01-01T${entryTime}Z`);
-        const exitDate = new Date(`1970-01-01T${exitTime}Z`);
-        const durationMs = exitDate.getTime() - entryDate.getTime();
-        return durationMs / 3600000; // Convert milliseconds to hours
-    };
 
 
     return (
