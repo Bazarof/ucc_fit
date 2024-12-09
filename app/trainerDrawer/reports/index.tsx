@@ -7,10 +7,13 @@ import {
     Modal,
     StyleSheet,
     Pressable,
+    Alert,
 } from "react-native";
-import storage from "@react-native-firebase/storage";
-import Pdf from "react-native-pdf";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import firestore from "@react-native-firebase/firestore";
+import storage from "@react-native-firebase/storage";
+import * as Print from "expo-print";
+import Pdf from "react-native-pdf";
 
 export default function TrainerReports() {
     const [date, setDate] = useState(new Date());
@@ -45,16 +48,132 @@ export default function TrainerReports() {
         fetchReports();
     }, []);
 
-    // Function to get the download URL of a selected PDF file
-    const fetchPdfUrl = async (fileName: string) => {
+    // Function to generate the report and convert it to PDF
+    // Function to generate the report and convert it to PDF
+    const generateReport = async () => {
         try {
-            const url = await storage().ref(`reports/${fileName}`).getDownloadURL();
-            setSelectedPdfUrl(url); // Set the URL for the PDF viewer
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0)); // Start of the selected date
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999)); // End of the selected date
+
+            // Fetch attendance data from Firestore
+            const snapshot = await firestore()
+                .collection("attendance")
+                .where("created_at", ">=", startOfDay) // Filter for selected date (start of day)
+                .where("created_at", "<=", endOfDay) // Filter for selected date (end of day)
+                .get();
+
+            const attendanceData = snapshot.docs.map((doc) => doc.data());
+
+            // Create a map to store entries by user ID
+            const usersMap = new Map();
+
+            // Iterate over the attendance data to organize entries and exits
+            attendanceData.forEach((entry) => {
+                const userId = entry.user.split("/")[1]; // Extract the user ID from the user reference
+                const userTime = entry.created_at.toDate().toLocaleTimeString("es-MX");
+
+                // If the user doesn't exist in the map, create a new entry
+                if (!usersMap.has(userId)) {
+                    usersMap.set(userId, { name: userId, entryTime: null, exitTime: null });
+                }
+
+                const user = usersMap.get(userId);
+
+                if (entry.type === "in" && !user.entryTime) {
+                    // If it's an "in" type and entryTime is not set, set the entry time
+                    user.entryTime = userTime;
+                } else if (entry.type === "out" && !user.exitTime) {
+                    // If it's an "out" type and exitTime is not set, set the exit time
+                    user.exitTime = userTime;
+                }
+            });
+
+            // Fetch user names and calculate stay durations
+            const userNames = new Map();
+            const userPromises: any[] = [];
+
+            usersMap.forEach((user, userId) => {
+                const userRef = firestore().doc(`users/${userId}`);
+                userPromises.push(
+                    userRef.get().then((userDoc) => {
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            userNames.set(userId, userData?.displayName || "Usuario");
+                        }
+                    })
+                );
+            });
+
+            console.log(usersMap)
+
+            await Promise.all(userPromises);
+
+            // Build the HTML content for the table
+            const tableRows: string[] = [];
+            usersMap.forEach((user, userId, map) => {
+                const name = userNames.get(userId);
+                const stayDuration = user.entryTime && user.exitTime
+                    ? calculateStayDuration(user.entryTime, user.exitTime)
+                    : 0;
+
+                tableRows.push(`
+                <tr>
+                    <td>${tableRows.length + 1}</td>
+                    <td>${name}</td>
+                    <td>${user.entryTime || "N/A"}</td>
+                    <td>${user.exitTime || "N/A"}</td>
+                    <td>${stayDuration.toFixed(2)} hrs</td>
+                </tr>
+            `);
+            });
+
+            const htmlContent = `
+            <html>
+                <body>
+                    <h2>Reporte de Asistencia - ${date.toLocaleDateString("es-MX")}</h2>
+                    <table border="1" cellspacing="0" cellpadding="5" style="width:100%; text-align: center;">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nombre</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                                <th>Estancia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows.join("")}
+                        </tbody>
+                    </table>
+                </body>
+            </html>
+        `;
+
+            // Generate PDF from HTML
+            const { uri } = await Print.printToFileAsync({ html: htmlContent });
+
+            // Upload the generated PDF to Firebase Storage
+            const reportRef = storage().ref(`reports/report-${date.toISOString()}.pdf`);
+            await reportRef.putFile(uri);
+
+            // Get the URL of the uploaded PDF
+            const pdfUrl = await reportRef.getDownloadURL();
+            setSelectedPdfUrl(pdfUrl); // Set the URL for the PDF viewer
             setModalVisible(true); // Show the modal
         } catch (error) {
-            console.error("Error fetching PDF URL:", error);
+            console.error("Error generating report:", error);
+            Alert.alert("Error", "Failed to generate the report.");
         }
     };
+
+    // Helper function to calculate the duration between entry and exit times
+    const calculateStayDuration = (entryTime: string, exitTime: string): number => {
+        const entryDate = new Date(`1970-01-01T${entryTime}Z`);
+        const exitDate = new Date(`1970-01-01T${exitTime}Z`);
+        const durationMs = exitDate.getTime() - entryDate.getTime();
+        return durationMs / 3600000; // Convert milliseconds to hours
+    };
+
 
     return (
         <View style={{ padding: 20, flex: 1 }}>
@@ -80,7 +199,7 @@ export default function TrainerReports() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={openPicker}
+                    onPress={generateReport} // Trigger report generation
                     style={{
                         backgroundColor: "#007FAF",
                         padding: 10,
@@ -112,7 +231,10 @@ export default function TrainerReports() {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                     <TouchableOpacity
-                        onPress={() => fetchPdfUrl(item)} // Fetch and display the PDF URL
+                        onPress={() => {
+                            setSelectedPdfUrl(`reports/${item}`);
+                            setModalVisible(true);
+                        }} // Fetch and display the selected PDF URL
                         style={{
                             padding: 10,
                             borderBottomWidth: 1,
