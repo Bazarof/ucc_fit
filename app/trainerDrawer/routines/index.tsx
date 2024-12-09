@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Link, router } from "expo-router";
 import CardView from "@/components/CardView";
 import IntensityIcon from "@/components/IntensityIcon";
+import { FAB } from "react-native-paper";
 
 const routinesCollection = firestore().collection("routines");
 // const routinesCollection = collection(firestore(), "routines");
@@ -156,6 +157,15 @@ const TrainerRoutines = () => {
             onEndReached={fetchMoreRoutines}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter}
+          />
+
+          <FAB
+            style={styles.fab}
+            color="white"
+            icon="plus"
+            onPress={() => {
+              router.push("/trainerDrawer/routines/create");
+            }}
           />
         </>
       )}
