@@ -150,7 +150,7 @@ export default function CustomDrawerContent(props: any) {
         <Pressable
           style={{ alignContent: "flex-end" }}
           onPress={() => {
-            router.push("/adminDrawer/configuracion");
+            router.push("/trainerDrawer/configuracion");
           }}
         >
           <Image
