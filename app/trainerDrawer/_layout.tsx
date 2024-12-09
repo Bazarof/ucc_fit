@@ -49,6 +49,13 @@ export default function Layout() {
             title: "Configuración",
           }}
         />
+
+        <Drawer.Screen
+          name="reports"
+          options={{
+            title: "Reportes",
+          }}
+        />
       </Drawer>
     </GestureHandlerRootView>
   );

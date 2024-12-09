@@ -2,6 +2,7 @@ import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { usePathname, router } from "expo-router";
 import { useEffect } from "react";
 import { View, Text, Image, Pressable } from "react-native";
+import { Icon } from "react-native-paper";
 
 export default function CustomDrawerContent(props: any) {
   const pathName = usePathname();
@@ -100,13 +101,7 @@ export default function CustomDrawerContent(props: any) {
 
           <DrawerItem
             icon={() => (
-              <Image
-                style={{
-                  width: 30,
-                  height: 30,
-                }}
-                source={require("../../assets/images/icons/dumbell.png")}
-              />
+              <Icon source="calendar" size={30} color="#000" />
             )}
             label={"Rutinas"}
             labelStyle={{ fontSize: 20, color: "#000" }}
@@ -118,26 +113,7 @@ export default function CustomDrawerContent(props: any) {
             }}
           />
 
-          {/* <DrawerItem
-            icon={() => (
-              <Image
-                style={{
-                  width: 30,
-                  height: 30,
-                }}
-                source={require("../../assets/images/icons/cutlery.png")}
-              />
-            )}
-            label={"Plan alimenticio"}
-            labelStyle={{ fontSize: 20, color: "#000" }}
-            onPress={() => {
-              router.push("/studentDrawer/planalimenticio");
-            }}
-            style={{
-              backgroundColor:
-                pathName === "/planalimenticio" ? "#E3E3E3" : "#fff",
-            }}
-          />
+
           <DrawerItem
             icon={() => (
               <Image
@@ -148,16 +124,16 @@ export default function CustomDrawerContent(props: any) {
                 source={require("../../assets/images/icons/bar-graph.png")}
               />
             )}
-            label={"Estadísticas"}
+            label={"Reportes"}
             labelStyle={{ fontSize: 20, color: "#000" }}
             onPress={() => {
-              router.push("/studentDrawer/estadisticas");
+              router.push("/trainerDrawer/reports");
             }}
             style={{
               backgroundColor:
-                pathName === "/estadisticas" ? "#E3E3E3" : "#fff",
+                pathName === "/reports" ? "#E3E3E3" : "#fff",
             }}
-          /> */}
+          />
         </View>
       </DrawerContentScrollView>
       <View
