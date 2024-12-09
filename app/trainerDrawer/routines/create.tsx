@@ -1,5 +1,10 @@
 import { getAllExercises } from "@/services/exerciseService";
 import { createRoutine } from "@/services/routineService";
+import {
+  doc,
+  collection,
+  getFirestore,
+} from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -101,7 +106,9 @@ export default function CreateRoutine() {
             const routine: any = {
               name,
               description,
-              exercises: exercises.map((exercise) => `exercises/${exercise}`),
+              exercises: exercises.map((exercise) =>
+                doc(collection(getFirestore(), "exercises"), exercise.key)
+              ),
               image_url:
                 routineImages[Math.floor(Math.random() * routineImages.length)],
             };

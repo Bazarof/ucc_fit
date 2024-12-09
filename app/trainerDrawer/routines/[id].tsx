@@ -97,10 +97,12 @@ const Routine = () => {
                 }}
               >
                 <View style={[styles.container, { alignItems: "center" }]}>
-                  <Image
-                    style={{ width: 180, height: 120 }}
-                    source={{ uri: exercise.image_url }}
-                  />
+                  {exercise?.image_url && (
+                    <Image
+                      style={{ width: 180, height: 120 }}
+                      source={{ uri: exercise?.image_url }}
+                    />
+                  )}
                 </View>
                 <View>
                   <Text style={styles.subtitle}>{exercise.name}</Text>
