@@ -129,74 +129,86 @@ export default function home() {
   }, []);
 
   return (
-    <View style={[styles.container,]}>
-      <ScrollView style={[styles.scrollview,]}>
-
+    <View style={[styles.container]}>
+      <ScrollView style={[styles.scrollview]}>
         {/* Mi entrenamiento */}
         <CardView>
-
           <View style={[styles.container]}>
             <Text style={styles.title}>Mi entrenamiento</Text>
           </View>
 
-          <View style={[styles.container, { flexDirection: 'row' }]}>
+          <View style={[styles.container, { flexDirection: "row" }]}>
             <View style={[styles.container]}>
-              <Text style={[styles.progressTitle,]}>{(Math.floor(progreso * 100)) + '%'}</Text>
+              <Text style={[styles.progressTitle]}>
+                {Math.floor(progreso * 100) + "%"}
+              </Text>
             </View>
-            <View style={[styles.container, { justifyContent: 'flex-end', }]}>
-              <Text style={styles.textSesiones}>{sesiones + '/' + totalSesiones + ' sesiones'}</Text>
+            <View style={[styles.container, { justifyContent: "flex-end" }]}>
+              <Text style={styles.textSesiones}>
+                {sesiones + "/" + totalSesiones + " sesiones"}
+              </Text>
             </View>
           </View>
 
-          <View style={[styles.container, { width: '100%' }]}>
-            <ProgressBar progress={progreso} style={styles.progressBar} color="#007FAF" />
+          <View style={[styles.container, { width: "100%" }]}>
+            <ProgressBar
+              progress={progreso}
+              style={styles.progressBar}
+              color="#007FAF"
+            />
           </View>
-
         </CardView>
 
         {/* Tu rutina */}
         <CardView>
-
           <View style={[styles.container]}>
             <Text style={styles.title}>Seguimiento</Text>
           </View>
 
-          <View style={[styles.container, { flexDirection: 'row', marginBottom: 15 }]}>
-
-            <View style={{ flex: 1, flexDirection: 'row' }}>
-              <Image style={{ width: 42, height: 42, marginTop: 15, marginEnd: 10 }} source={require('../../../assets/images/icons/dumbell.png')} />
+          <View
+            style={[
+              styles.container,
+              { flexDirection: "row", marginBottom: 15 },
+            ]}
+          >
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <Image
+                style={{ width: 42, height: 42, marginTop: 15, marginEnd: 10 }}
+                source={require("../../../assets/images/icons/dumbell.png")}
+              />
               <View style={[styles.container]}>
                 <Text style={styles.text}>{consecutiveWeeks}</Text>
                 <Text style={{ lineHeight: 25 }}>
-                  {'Semanas de '}
-                  {'entrenamiento '}
-                  {'consecutivas'}
+                  {"Semanas de "}
+                  {"entrenamiento "}
+                  {"consecutivas"}
                 </Text>
               </View>
             </View>
 
-
-            <View style={{ flex: 1, flexDirection: 'row' }}>
-
-              <View style={{ height: '100%', padding: 7 }}>
-                <Image style={{ height: 30, width: 30 }} source={require('../../../assets/images/icons/yellow-status.png')} />
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={{ height: "100%", padding: 7 }}>
+                <Image
+                  style={{ height: 30, width: 30 }}
+                  source={require("../../../assets/images/icons/yellow-status.png")}
+                />
               </View>
 
               <View style={[styles.container]}>
-                <Text style={[styles.text,]}>Medio</Text>
+                <Text style={[styles.text]}>Medio</Text>
                 <Text style={{ lineHeight: 25 }}>
-                  {'Compromiso con el '}
-                  {'entrenamiento'}
+                  {"Compromiso con el "}
+                  {"entrenamiento"}
                 </Text>
               </View>
             </View>
-
           </View>
 
           <View style={styles.conatinerStatus}>
-            <Text style={styles.textStatus}>¡Estás en el camino correcto :)!</Text>
+            <Text style={styles.textStatus}>
+              ¡Estás en el camino correcto :)!
+            </Text>
           </View>
-
         </CardView>
 
         <CardView>
@@ -204,52 +216,75 @@ export default function home() {
             <Text style={[styles.title]}>En el último mes</Text>
           </View>
 
-          <View style={[styles.container,
-          {
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }]}>
-            <View style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-              backgroundColor: '#F2F2F2',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginBottom: 15
-            }}>
+          <View
+            style={[
+              styles.container,
+              {
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: "#F2F2F2",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 15,
+              }}
+            >
               <Text style={{ fontSize: 32 }}>{sessionsThisMonth}</Text>
             </View>
             <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#525252', textAlign: 'center' }}>
-                {'Entrenamientos\n'}
-                {'completados'}
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  color: "#525252",
+                  textAlign: "center",
+                }}
+              >
+                {"Entrenamientos\n"}
+                {"completados"}
               </Text>
             </View>
           </View>
-
         </CardView>
 
         {/* Advertisement */}
-          
-        { promotions &&
+
+        {promotions &&
           promotions.map((promo: Promotion) => (
-            <ImageCardView>
-              <Image style={{height: 200, width: '100%', borderRadius: 20, position: 'absolute', top: 0}}  source={{uri: promo.image_url}} resizeMode={'cover'}/>
+            <ImageCardView key={promo.uid}>
+              <Image
+                style={{
+                  height: 200,
+                  width: "100%",
+                  borderRadius: 20,
+                  position: "absolute",
+                  top: 0,
+                }}
+                source={{ uri: promo.image_url }}
+                resizeMode={"cover"}
+              />
               <View style={[styles.overlay, StyleSheet.absoluteFill]}>
-                <View style={{flex: 1}}>
-                  <Text style={[styles.overlayText, {fontSize: 36}]}>{promo.title}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.overlayText, { fontSize: 36 }]}>
+                    {promo.title}
+                  </Text>
                 </View>
-                <View style={{flex: 1}}>
-                  <Text style={[styles.overlayText, {fontSize: 20}]}>{promo.subtitle}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.overlayText, { fontSize: 20 }]}>
+                    {promo.subtitle}
+                  </Text>
                 </View>
               </View>
             </ImageCardView>
-            ))
-        }
-       
-
+          ))}
       </ScrollView>
       <FAB
         style={styles.fab}
