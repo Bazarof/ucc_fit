@@ -1,14 +1,15 @@
 import ResourceList from "@/components/ResourceList";
 import { getCompletedSessions } from "@/services/attendanceService";
 import { getStudentsWithoutRoutine } from "@/services/routineService";
+import Meal from "@/types/Meal";
 import MealPlan from "@/types/MealPlan";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-native";
 import { Icon } from "react-native-paper";
 
 
-const MealPlanItem = (item: MealPlan) => {
+const MealItem = (item: Meal) => {
   const router = useRouter();
 
   return (
@@ -29,47 +30,9 @@ const MealPlanItem = (item: MealPlan) => {
           flexDirection: "row",
         }}
       >
-        <View style={{ height: 80, width: 80, backgroundColor: "red" }}></View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-end",
-            marginHorizontal: 10,
-            flex: 0.2,
-          }}
-        >
-          <View
-            style={{
-              width: 10,
-              height: 10,
-              backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-          <View
-            style={{
-              width: 10,
-              height: 20,
-              // backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-          <View
-            style={{
-              width: 10,
-              height: 30,
-              // backgroundColor: "gray",
-              borderColor: "gray",
-              borderWidth: 2,
-              marginHorizontal: 1,
-            }}
-          ></View>
-        </View>
+        {item.image_url ? <Image source={{
+          uri: item.image_url
+        }} style={{ width: 100, height: 100 }} /> : <View style={{ height: 80, width: 80, backgroundColor: "red" }}></View>}
 
         <View
           style={{
@@ -82,7 +45,7 @@ const MealPlanItem = (item: MealPlan) => {
             {item.name}
           </Text>
           <View>
-            <Text>01:30 hr</Text>
+            <Text>{item.description}</Text>
           </View>
         </View>
       </View>
@@ -92,9 +55,9 @@ const MealPlanItem = (item: MealPlan) => {
 
 export default function NutritionistDrawerIndex() {
   return (
-    <ResourceList<MealPlan>
+    <ResourceList<Meal>
       collectionName="meals"
-      itemRenderer={(item) => <MealPlanItem {...item} />}
+      itemRenderer={(item) => <MealItem {...item} />}
       createRoute={"/nutritionistDrawer/meals/create"}
     />
   );

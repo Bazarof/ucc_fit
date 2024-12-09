@@ -1,4 +1,5 @@
 import { getCompletedSessions } from "@/services/attendanceService";
+import { getDateofLastPlan, getUsersWithMealPlan, getUsersWithoutMealPlan } from "@/services/mealPlanService";
 import { getStudentsWithoutRoutine } from "@/services/routineService";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -6,18 +7,18 @@ import { Icon } from "react-native-paper";
 
 interface CardProps {
   title: string;
-  value: number;
+  value: string;
   unit: string;
   description: string;
   icon: string;
   iconColor: string;
 }
 
-function Card({ title, value, unit, description }: CardProps) {
+function Card({ title, value, unit, icon, iconColor, description }: CardProps) {
   return <View style={{ backgroundColor: "white", margin: 5, borderRadius: 15, padding: 15, flex: 1 }}>
     <Text style={{ fontSize: 18 }}>{title}</Text>
     <View style={{ flexDirection: "row", padding: 5 }}>
-      <Icon source="alert" size={30} color="red" />
+      <Icon source={icon} size={30} color={iconColor} />
       <View style={{ paddingLeft: 5 }}>
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>{value} {unit}</Text>
         <Text>{description}</Text>
@@ -31,27 +32,35 @@ export default function NutritionistDrawerIndex() {
   const [studentsWithoutRoutine, setStudentsWithoutRoutine] = useState(0);
   const [attendance, setAttendance] = useState(0);
 
+  const [usersWithoutMealPlan, setUsersWithoutMealPlan] = useState(0);
+  const [usersWithMealPlan, setUsersWithMealPlan] = useState(0);
+  const [dateOfLastPlan, setDateOfLastPlan] = useState<Date>();
 
   useEffect(() => {
-    getStudentsWithoutRoutine()
-      .then((students) => {
-        setStudentsWithoutRoutine(students);
-        console.log("Students without routine: ", studentsWithoutRoutine);
-      })
-      .catch((error) => {
-        console.error(error);
-      }).finally(() => {
-        setLoading(false);
-      });
-
-    getCompletedSessions().then((sessions) => {
-      setAttendance(sessions);
+    getUsersWithoutMealPlan().then((users) => {
+      setUsersWithoutMealPlan(users);
     }).catch((error) => {
       console.error(error);
     }).finally(() => {
       setLoading(false);
-      console.log("Attendance: ", attendance);
     });
+
+    getUsersWithMealPlan().then((users) => {
+      setUsersWithMealPlan(users);
+    }).catch((error) => {
+      console.error(error);
+    }).finally(() => {
+      setLoading(false);
+    });
+
+    getDateofLastPlan().then((date) => {
+      setDateOfLastPlan(date);
+    }).catch((error) => {
+      console.error(error);
+    }).finally(() => {
+      setLoading(false);
+    });
+
   }, []);
 
   if (loading) {
@@ -63,8 +72,12 @@ export default function NutritionistDrawerIndex() {
     <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>Resumen</Text>
 
     <View style={{ flexDirection: "row" }}>
-      <Card title="Asistencias" value={attendance} unit="sesiones" description="este mes" icon="alert" iconColor="red" />
-      <Card title="Rutinas" value={studentsWithoutRoutine} unit="estudiantes" description="sin rutina" icon="alert" iconColor="red" />
+      <Card title='Usuarios con plan' value={usersWithMealPlan.toString()} unit='estudiantes' description='atendidos' icon='check' iconColor='green' />
+      <Card title="Usuarios sin plan" value={usersWithoutMealPlan.toString()} unit="estudiantes" description="sin plan" icon="alert" iconColor="red" />
+    </View>
+
+    <View style={{ flexDirection: "row" }}>
+      <Card title="Actividad" value={dateOfLastPlan?.toLocaleDateString('es-MX') ?? 'N/A'} unit="" description="Último plan creado" icon="calendar" iconColor="blue" />
     </View>
 
   </View>

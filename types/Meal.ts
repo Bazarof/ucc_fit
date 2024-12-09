@@ -1,8 +1,9 @@
 export default interface Meal {
-    id: number;
+    uid: string;
     name: string;
     description: string;
+    image_url: string;
     // ingredients: Ingredient[];
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
 }

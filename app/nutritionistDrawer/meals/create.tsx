@@ -6,7 +6,7 @@ const CreateMealScreen = () => {
     const fields: Field[] = [
         { name: "name", label: "Nombre", type: "text", validation: { required: true, minLength: 3 } },
         { name: "description", label: "Descripción", type: "textarea" },
-        // { name: "image_url", label: "Imagen", type: "file", validation: { required: true } },
+        { name: "image_url", label: "Imagen", type: "file", validation: { required: true } },
     ];
 
     const handleSubmit = async (formData: any) => {

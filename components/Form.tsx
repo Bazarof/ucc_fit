@@ -1,28 +1,66 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    ActivityIndicator,
+    Image,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadFileToFirebase, saveFileUrlToFirestore } from "@/services/fileService";
 import { useRouter } from "expo-router";
+import { SelectList } from "react-native-dropdown-select-list";
+import { FirebaseFirestoreTypes, collection, getDocs, getFirestore } from "@react-native-firebase/firestore";
+import MealSelect from "./MealSelect";
 
 export interface Field {
     name: string;
     label: string;
     type: string;
     validation?: { required?: boolean; minLength?: number; maxLength?: number };
+    options?: string[];
+    model?: string;
 }
 
 interface FormProps {
     title: string;
     fields: Field[];
     collectionName: string;
-    docId?: string;  // Now optional for the case when creating a new document
+    docId?: string; // Optional for creating a new document
     onSubmit: (formData: any, docId: string | null) => void;
 }
 
 const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null, onSubmit }) => {
     const [formData, setFormData] = useState<any>({});
     const [errors, setErrors] = useState<any>({});
-    const router = useRouter()
+    const [loading, setLoading] = useState<boolean>(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const router = useRouter();
+    const [fieldSources, setFieldSources] = useState<any[]>([]);
+
+    useEffect(() => {
+
+        const modelNames = fields.filter((field) => field.model && field.model != undefined).map((field) => field.model);
+
+        if (!modelNames.length) return;
+
+        for (const modelName of modelNames) {
+            const db = getFirestore();
+            const modelCollection = collection(db, modelName as string);
+
+            getDocs(modelCollection).then((querySnapshot) => {
+                const options = querySnapshot.docs.map((doc) => ({
+
+                    ...doc.data(), uid: doc.id
+                }));
+
+                setFieldSources((prevSources) => [...prevSources, { name: modelName, data: options }]);
+            })
+        }
+    }, []);
 
     const handleInputChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -31,17 +69,25 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
     const handleFileUpload = async (name: string) => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            // allowsEditing: true,
             quality: 1,
             selectionLimit: 1,
-
         });
 
         if (!result.canceled) {
+            setLoading(true); // Start loader
             const fileUri = result.assets[0].uri;
-            const downloadUrl = await uploadFileToFirebase(fileUri, "uploads");
-            setFormData({ ...formData, [name]: downloadUrl });
-            await saveFileUrlToFirestore(collectionName, docId, name, downloadUrl); // Save URL whether updating or creating
+
+            try {
+                const downloadUrl = await uploadFileToFirebase(fileUri, "uploads");
+                setFormData({ ...formData, [name]: downloadUrl });
+                setImagePreview(downloadUrl); // Set preview
+                await saveFileUrlToFirestore(collectionName, docId, name, downloadUrl);
+                Alert.alert("Success", "File uploaded successfully!");
+            } catch (error) {
+                Alert.alert("Error", "Failed to upload file.");
+            } finally {
+                setLoading(false); // Stop loader
+            }
         }
     };
 
@@ -81,30 +127,92 @@ const Form: React.FC<FormProps> = ({ title, fields, collectionName, docId = null
         }
     };
 
+    const renderField = (field: Field) => {
+        switch (field.type) {
+            case 'file':
+
+                return <>
+                    <TouchableOpacity
+                        onPress={() => handleFileUpload(field.name)}
+                        style={styles.fileInput}
+                    >
+                        <Text>{loading ? "Cargando..." : "Cargar"}</Text>
+                    </TouchableOpacity>
+                    {loading && <ActivityIndicator size="small" color="#007FAF" />}
+                    {imagePreview && <Image source={{ uri: imagePreview }} style={styles.imagePreview} />}
+                </>
+
+            case 'select':
+
+                const handleSelectChange = (fieldName: string, selectedValue: string) => {
+                    setFormData((prevData: any) => ({ ...prevData, [fieldName]: selectedValue }));
+                };
+
+                let mappedOptions =
+                    field.options && !field.model
+                        ? field.options.map((option) => ({
+                            key: option,
+                            value: option,
+                        }))
+                        : [];
+
+
+                if (field.model) {
+                    let optionKey = 'uid'
+                    let optionValue = 'name'
+
+                    if (field.model === 'users') {
+                        optionKey = 'uid'
+                        optionValue = 'displayName'
+                    }
+
+                    mappedOptions = fieldSources.find((source) => source.name === field.model)?.data.map((option: any) => ({
+                        key: option[optionKey],
+                        value: option[optionValue],
+                    })) || [];
+                }
+
+                return (
+                    <SelectList
+                        data={mappedOptions}
+                        setSelected={(value: string) => handleSelectChange(field.name, value)}
+                        save="key"
+                        searchPlaceholder={`Search ${field.label}`}
+                        placeholder={field.label}
+                        boxStyles={{ marginTop: 10 }}
+                        inputStyles={{ color: "gray" }}
+                    />
+                );
+
+
+            case 'meal_select':
+                return <MealSelect
+                    onUpdate={(value: any) => handleInputChange("meal_select", value)}
+                />
+
+            default:
+                return <TextInput
+                    style={styles.textInput}
+                    onChangeText={(value) => handleInputChange(field.name, value)}
+                    value={formData[field.name] || ""}
+                    placeholder={field.label}
+                    secureTextEntry={field.type === "password"}
+                />
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{title}</Text>
             {fields.map((field) => (
                 <View key={field.name} style={styles.inputContainer}>
                     <Text>{field.label}</Text>
-                    {field.type === "file" ? (
-                        <TouchableOpacity onPress={() => handleFileUpload(field.name)} style={styles.fileInput}>
-                            <Text>Upload File</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <TextInput
-                            style={styles.textInput}
-                            onChangeText={(value) => handleInputChange(field.name, value)}
-                            value={formData[field.name] || ""}
-                            placeholder={field.label}
-                            secureTextEntry={field.type === "password"}
-                        />
-                    )}
+                    {renderField(field)}
                     {errors[field.name] && <Text style={styles.errorText}>{errors[field.name]}</Text>}
                 </View>
             ))}
             <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                <Text style={styles.buttonText}>Submit</Text>
+                <Text style={styles.buttonText}>Enviar</Text>
             </TouchableOpacity>
         </View>
     );
@@ -133,6 +241,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f0f0f0",
         borderRadius: 5,
         textAlign: "center",
+        marginTop: 5,
     },
     button: {
         backgroundColor: "#007FAF",
@@ -143,12 +252,18 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "white",
         textAlign: "center",
+        fontWeight: "bold",
     },
     errorText: {
         color: "red",
         marginTop: 5,
     },
+    imagePreview: {
+        width: 100,
+        height: 100,
+        marginTop: 10,
+        borderRadius: 5,
+    },
 });
-
 
 export default Form;
