@@ -11,7 +11,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { Icon } from "react-native-paper";
 
 // Define the possible resource types as a union type
-type ResourceType = "exercises" | "meals" | "mealplans" | "routines" | "users";
+type ResourceType = "exercises" | "meals" | "meal_plans" | "routines" | "users";
 
 // Define a generic type that extends any resource
 type AnyResource = Exercise | Meal | MealPlan | Routine | User;

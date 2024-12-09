@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 
-['Perder peso', 'Ganar peso', 'Ganar masa muscular', 'Mantener peso', 'Mejorar salud']
+// ['Perder peso', 'Ganar peso', 'Ganar masa muscular', 'Mantener peso', 'Mejorar salud']
 const getMealPlanImage = (mealPlan: MealPlan) => {
   switch (mealPlan.objective) {
     case 'Perder peso':
