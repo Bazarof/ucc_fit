@@ -32,20 +32,21 @@ const MealItem = (item: Meal) => {
       >
         {item.image_url ? <Image source={{
           uri: item.image_url
-        }} style={{ width: 100, height: 100 }} /> : <View style={{ height: 80, width: 80, backgroundColor: "red" }}></View>}
+        }} style={{ width: 100, height: 100, flex: 1 }} /> : <View style={{ height: 80, width: 80, backgroundColor: "gray" }}></View>}
 
         <View
           style={{
             justifyContent: "center",
             alignItems: "flex-end",
             flexGrow: 1,
+            flex: 4
           }}
         >
           <Text style={{ marginBottom: 30, fontWeight: "bold", fontSize: 16 }}>
             {item.name}
           </Text>
-          <View>
-            <Text>{item.description}</Text>
+          <View >
+            <Text style={{ textAlign: "right", }}>{item.description}</Text>
           </View>
         </View>
       </View>

@@ -6,8 +6,9 @@ import { User } from "@/types/User";
 import firestore from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Text } from "react-native";
+import { ActivityIndicator, Alert, Text, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { Icon } from "react-native-paper";
 
 // Define the possible resource types as a union type
 type ResourceType = "exercises" | "meals" | "mealplans" | "routines" | "users";
@@ -61,6 +62,15 @@ export default function ResourceDetail<T extends AnyResource>({
                 // Pass the resource to the children function
                 children(resource)
             )}
+
+            <TouchableOpacity onPress={() => {
+                if (navigation.canGoBack()) {
+                    navigation.goBack();
+                }
+            }} style={{ flexDirection: "row", marginVertical: 20, justifyContent: "flex-start", alignItems: "center" }}>
+                <Icon source="arrow-left" color="black" size={24} />
+                <Text> Volver</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 }
