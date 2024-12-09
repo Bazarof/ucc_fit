@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "white",
         textAlign: "center",
+        fontWeight: "bold",
     },
     errorText: {
         color: "red",

@@ -14,7 +14,7 @@ const CreateMealPlanScreen = () => {
     const handleSubmit = async (formData: any) => {
         console.log("Submitted Data:", formData);
 
-        await createMealPlan(formData);
+        await createMealPlan({ ...formData, created_at: new Date() });
     };
 
     return (
