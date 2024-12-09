@@ -176,7 +176,8 @@ export default function TrainerReports() {
             const { uri } = await Print.printToFileAsync({ html: htmlContent });
 
             // Upload the generated PDF to Firebase Storage
-            const reportRef = storage().ref(`reports/report-${date.toISOString()}.pdf`);
+
+            const reportRef = storage().ref(`reports/Asistencia_${date.toLocaleDateString('es-MX').replaceAll('/', '_')}.pdf`);
             await reportRef.putFile(uri);
 
             // Get the URL of the uploaded PDF
